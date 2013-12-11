@@ -1,0 +1,26 @@
+#!/bin/bash
+set -eu
+
+run() {
+    echo >&2 "+ $*"
+    "$@"
+}
+
+trap 'echo ERROR' EXIT
+
+run systemsetup -setremotelogin on
+
+if ! which sixword >/dev/null; then
+    run gem install sixword # TODO: sudo?
+fi
+
+echo "Potential IP addresses:"
+for i in $(seq 0 "$(ipconfig ifcount)"); do
+    if="en$i"
+    echo "$if: $(ipconfig getifaddr "$if")"
+done
+
+echo "SSH key fingerprint:"
+ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
+
+trap - EXIT
