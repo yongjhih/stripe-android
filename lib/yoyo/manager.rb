@@ -33,12 +33,13 @@ module Yoyo
       log.debug "Starting SSH connection"
       ssh_known_hosts_file = File.expand_path('~/.ssh/known_hosts-yoyo')
       begin
-        @ssh = SpaceCommander::SSH::Connection.new(ip_address, username,
+        @ssh = SpaceCommander::SSH::Connection.new(username, ip_address,
           :user_known_hosts_file => ssh_known_hosts_file)
       rescue Net::SSH::HostKeyUnknown => err
         fingerprint = ssh_prompt_for_fingerprint
         if fingerprint == err.fingerprint
           log.info "Fingerprint matches, retrying connection"
+          err.remember_host!
           retry
         else
           log.error "Fingerprint does not match"

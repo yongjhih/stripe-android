@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sixword'
   spec.add_dependency 'subprocess'
   spec.add_dependency 'space-commander'
+  spec.add_dependency 'highline'
 end

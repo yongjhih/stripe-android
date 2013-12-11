@@ -10,8 +10,11 @@ trap 'echo ERROR' EXIT
 
 run systemsetup -setremotelogin on
 
+# SSH key doesn't exist until we hit the SSH server for the first time
+nc -z localhost 22
+
 if ! which sixword >/dev/null; then
-    run gem install sixword # TODO: sudo?
+    run sudo gem install sixword
 fi
 
 echo "Potential IP addresses:"
