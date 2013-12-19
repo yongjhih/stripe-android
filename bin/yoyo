@@ -2,3 +2,45 @@
 
 require 'optparse'
 require_relative '../lib/yoyo'
+
+def usage
+  $stderr.puts <<-EOM
+usage: #{File.basename($0)} COMMAND [ARGS...]
+
+Commands:
+
+    spinup IP_ADDRESS USERNAME FULL_NAME
+
+    init-ssh IP_ADDRESS USERNAME
+
+    EOM
+  return 1
+end
+
+def spinup(ip_address, username, full_name)
+  mgr = Yoyo::Manager.new(ip_address, username)
+  mgr.spin_up!
+end
+
+def init_ssh(ip_address, username)
+  mgr = Yoyo::Manager.new(ip_address, username)
+  mgr.deploy_authorized_keys!
+  mgr.log.info('Done!')
+end
+
+def parse_args!(args)
+  case args.first
+  when 'spinup'
+    return usage unless args.length == 4
+    spinup(*args[1..-1])
+  when 'init-ssh'
+    return usage unless args.length == 3
+    init_ssh(*args[1..-1])
+  else
+    return usage
+  end
+
+  return 0
+end
+
+exit(parse_args!(ARGV))

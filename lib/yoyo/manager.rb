@@ -3,14 +3,23 @@ require 'space-commander'
 
 module Yoyo
   class Manager
-    attr_reader :ip_address, :username, :full_name
+    attr_reader :ip_address, :username
 
-    def initialize(ip_address, username, full_name)
+    def initialize(ip_address, username, full_name=nil)
       @ip_address = ip_address
       @username = username
       @full_name = full_name
 
-      log.info("Preparing to spin up #{ip_address} for #{user_full_email}")
+      if full_name
+        log.info("Preparing to spin up #{ip_address} for #{user_full_email}")
+      else
+        log.info("Preparing to spin up #{ip_address}")
+      end
+    end
+
+    def full_name
+      @full_name or raise ArgumentError.new(
+        "full_name was not provided when this Manager was initialized")
     end
 
     def user_full_email
@@ -24,16 +33,28 @@ module Yoyo
     def run!
     end
 
-    def ssh
-      return @ssh if @ssh
-      ssh!
+    def target_serial
+      @target_serial ||= get_target_serial
     end
 
-    def ssh!
-      log.debug "Starting SSH connection"
+    def target_home
+      @target_home ||= ssh.check_call_shell!(
+        'echo "$HOME"', :quiet => true).first.chomp
+    end
+
+    def ssh
+      @ssh ||= ssh!(username)
+    end
+
+    def ssh_root
+      @ssh_root ||= ssh!('root')
+    end
+
+    def ssh!(user)
+      log.debug "Starting SSH connection for #{user}"
       ssh_known_hosts_file = File.expand_path('~/.ssh/known_hosts-yoyo')
       begin
-        @ssh = SpaceCommander::SSH::Connection.new(username, ip_address,
+        SpaceCommander::SSH::Connection.new(user, ip_address,
           :user_known_hosts_file => ssh_known_hosts_file)
       rescue Net::SSH::HostKeyUnknown => err
         fingerprint = ssh_prompt_for_fingerprint
@@ -65,6 +86,32 @@ module Yoyo
       log.debug("Decoded fingerprint to: #{colons}")
 
       colons
+    end
+
+    def deploy_authorized_keys!
+      log.info("Deploying #{local_ssh_pubkey} to target authorized_keys")
+      pubkey = File.read(local_ssh_pubkey)
+
+      dir = File.join(target_home, '.ssh')
+      ssh.check_call! %W{mkdir -vp #{dir}}
+      ssh.file_write(File.join(dir, 'authorized_keys'), pubkey)
+    end
+
+    def local_ssh_pubkey
+      File.expand_path('~/.ssh/id_rsa.pub')
+    end
+
+    private
+
+    def get_target_serial
+      cmd = %w{system_profiler SPHardwareDataType}
+      out, _, _ = ssh.check_call!(cmd, :quiet => true)
+      line = out.split("\n").grep(/\A\s*Serial Number \(system\):/).first
+      unless line
+        raise Error.new("No serial number in output: " + out.inspect)
+      end
+
+      return line.split(" ").last
     end
   end
 end
