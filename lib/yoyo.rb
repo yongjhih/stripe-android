@@ -8,6 +8,7 @@ end
 
 require_relative 'yoyo/errors'
 
-#require_relative 'yoyo/bootstrap-step'
-#require_relative 'yoyo/steps'
+require_relative 'yoyo/step'
+require_relative 'yoyo/step-list'
 require_relative 'yoyo/manager'
+require_relative 'yoyo/steps'

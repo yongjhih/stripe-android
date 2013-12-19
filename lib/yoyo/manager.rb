@@ -37,6 +37,10 @@ module Yoyo
       @target_serial ||= get_target_serial
     end
 
+    def target_certname
+      "#{target_serial.downcase}.serial.local"
+    end
+
     def target_home
       @target_home ||= ssh.check_call_shell!(
         'echo "$HOME"', :quiet => true).first.chomp

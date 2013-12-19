@@ -29,6 +29,7 @@ PATH
   remote: .
   specs:
     yoyo (0.0.1)
+      docile (~> 1.1)
       highline
       sixword
       space-commander
@@ -51,6 +52,7 @@ GEM
       lspace (~> 0.9)
       rack
     coderay (1.0.9)
+    docile (1.1.1)
     domainatrix (0.0.11)
       addressable
     faraday (0.8.8)
