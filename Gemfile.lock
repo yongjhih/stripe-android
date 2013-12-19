@@ -1,7 +1,7 @@
 GIT
   remote: git@github.com:stripe-internal/space-commander
-  revision: 031d07916b1962b02501adb08aace0e2c96bfb88
-  ref: 031d07916b1962b02501adb08aace0e2c96bfb88
+  revision: d1d7da58aa7972b124b090204b7e94be19fe0756
+  ref: d1d7da58aa7972b124b090204b7e94be19fe0756
   specs:
     space-commander (1.1.0)
       aws-sdk (~> 1.22)
