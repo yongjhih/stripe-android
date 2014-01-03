@@ -29,15 +29,18 @@ module Yoyo; module Steps
         run do
           marionette_dns = 'marionette.stripe.com'
           marionette_ssh = 'marionette1.stripe.io'
+          certname = mgr.target_certname
 
           mgr.ssh_root.call! %W{
-            puppet agent --mkusers --test --server #{marionette_dns}"}
+            puppet agent --mkusers --test --server #{marionette_dns}
+            --certname #{certname}}
 
           agent_cert = mgr.ssh_root.check_output!(
-            %w{puppet agent --test --fingerprint --digest sha256}).split.last
+            %W{puppet agent --test --fingerprint --digest sha256
+               --certname #{certname}}).split.last
           server_cert = Subprocess.check_output(%W{
             ssh #{marionette_ssh} marionette-cert list --digest sha256
-                #{mgr.target_certname}"}).split.last.delete('()')
+                #{certname}}).split.last.delete('()')
 
           if agent_cert != server_cert
             log.error("PUPPET CERT FINGERPRINT MISMATCH")
