@@ -37,6 +37,7 @@ module Yoyo
     def run_as_needed!
       if !idempotent? && complete?
         log.info('already complete')
+        return
       end
       run!
     end
