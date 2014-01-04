@@ -114,6 +114,15 @@ module Yoyo
       ssh.file_write(File.join(dir, 'authorized_keys'), pubkey)
     end
 
+    def disable_ssh!
+      log.warn("Removing remote authorized_keys and disabling ssh")
+      ssh_root.check_call_shell! 'rm ~/.ssh/authorized_keys'
+      ssh.check_call_shell! 'rm ~/.ssh/authorized_keys'
+      ssh_root.check_call!(%w{systemsetup -setremotelogin off},
+                           :input => "yes\n")
+      log.info("Done!")
+    end
+
     def local_ssh_pubkey
       File.expand_path('~/.ssh/id_rsa.pub')
     end
