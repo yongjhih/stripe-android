@@ -1,0 +1,12 @@
+bootstrap: [done]
+    enable SSH: `systemsetup -setremotelogin on`
+    use sixword to encode the SSH host key
+    print out the IP address
+
+yoyo init: [done]
+    use sixword to decode the SSH host key
+
+clean up:
+    disable SSH:
+        remove authorized_keys files
+        `systemsetup -setremotelogin off`
