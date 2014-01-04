@@ -30,7 +30,20 @@ module Yoyo
       @log ||= SpaceCommander::StripeLogger.new('yoyo')
     end
 
-    def run!
+    def spin_up!
+      log.info("Starting spin_up!")
+
+      step_classes = [
+        Yoyo::Steps::Marionette,
+      ]
+
+      step_classes.each do |klass|
+        log.info('Beginning step list: ' + klass.name)
+        steplist = klass.new(self)
+        steplist.run!
+      end
+
+      log.info("Finished spin_up!")
     end
 
     def target_serial

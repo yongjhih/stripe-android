@@ -17,7 +17,7 @@ module Yoyo
     end
 
     def log
-      @log ||= SpaceCommander::StripeLogger.new('Step::' + @name)
+      @log ||= SpaceCommander::StripeLogger.new("Step(#{@name})")
     end
 
     def idempotent?

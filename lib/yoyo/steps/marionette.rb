@@ -3,6 +3,7 @@ module Yoyo; module Steps
     def init_steps
       step 'set up facts' do
         idempotent
+
         run do
           mgr.ssh_root.check_call! %w{mkdir -p /etc/stripe/facts}
           mgr.ssh_root.file_write('/etc/stripe/facts/user.txt',
@@ -16,6 +17,7 @@ module Yoyo; module Steps
         complete? do
           mgr.ssh_root.if_call! %w{which puppet}, :quiet => true
         end
+
         run do
           mgr.ssh_root.check_call! %w{gem update --system}
           mgr.ssh_root.check_call! %w{gem install --no-ri --no-rdoc puppet}
@@ -26,6 +28,7 @@ module Yoyo; module Steps
         complete? do
           mgr.ssh_root.if_call! %w{test -e /etc/stripe/yoyo/marionette-auth}
         end
+
         run do
           marionette_dns = 'marionette.stripe.com'
           marionette_ssh = 'marionette1.stripe.io'
