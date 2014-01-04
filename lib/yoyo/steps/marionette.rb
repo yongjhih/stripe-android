@@ -69,9 +69,9 @@ module Yoyo; module Steps
         end
 
         run do
-          out, err, status = mgr.ssh_root.call! %W{
-            puppet agent --test --server #{step_list.marionette_dns}
-            --certname #{mgr.target_certname}}
+          out, err, status = mgr.ssh_root.call_shell!("cd /;" +
+            " puppet agent --test --server '#{step_list.marionette_dns}'" +
+            " --certname '#{mgr.target_certname}'")
 
           if status == 0 || status == 2
             log.info "Puppet run succeeded"
