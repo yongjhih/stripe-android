@@ -101,7 +101,7 @@ GEM
     rqrcode (0.4.2)
     ruby-hmac (0.4.0)
     sixword (0.2.0)
-    slop (3.4.6)
+    slop (3.4.7)
     subprocess (1.0.0)
     thor (0.18.1)
     uuidtools (2.1.4)
