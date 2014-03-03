@@ -25,7 +25,7 @@ fi
 trap 'echo ERROR' EXIT
 
 # enable SSH
-run systemsetup -setremotelogin on
+run sudo systemsetup -setremotelogin on
 
 # SSH key doesn't exist until we hit the SSH server for the first time
 echo hello | run nc -z localhost 22
