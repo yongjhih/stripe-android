@@ -34,16 +34,23 @@ if ! which sixword >/dev/null; then
     run sudo gem install sixword
 fi
 
+suggested_ip=''
 echo "Potential IP addresses:"
 for i in $(seq 0 "$(ipconfig ifcount)"); do
     if="en$i"
-    echo "$if: $(ipconfig getifaddr "$if")"
+    ip="$(ipconfig getifaddr "$if")"
+    echo "$if: $ip"
+    if [ -z "$suggested_ip" ] ; then
+        suggested_ip="$ip"
+    else
+        suggested_ip="{IP}"
+    fi
 done
 
 echo "SSH key fingerprint:"
 ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
 
-echo 'Please run `yoyo init-ssh ...` on the credentialer machine'
+echo "Please run \`yoyo init-ssh $suggested_ip $USER\` on the credentialer machine"
 read -p "Press enter when finished..." ans
 
 run sudo mkdir -vp ~root/.ssh
@@ -52,4 +59,8 @@ run sudo cp -v ~/.ssh/authorized_keys ~root/.ssh/
 trap - EXIT
 
 echo "Yoyo is now set up and ready to run!"
-echo 'Please run `yoyo spinup ...` on the credentialer machine'
+
+# Fairly terrible, but apparently this is the easiest way to read a
+# user's full name on OS X:
+fullname="$(dscacheutil -q user -a name "$USER" | /usr/bin/sed -e '/^gecos: /s/^gecos: // p' -e 'd')"
+echo "Please run \`yoyo spinup $suggested_ip $USER '$fullname'\` on the credentialer machine"
