@@ -38,12 +38,14 @@ suggested_ip=''
 echo "Potential IP addresses:"
 for i in $(seq 0 "$(ipconfig ifcount)"); do
     if="en$i"
-    ip="$(ipconfig getifaddr "$if")"
-    echo "$if: $ip"
-    if [ -z "$suggested_ip" ] ; then
-        suggested_ip="$ip"
-    else
-        suggested_ip="{IP}"
+    ip="$(ipconfig getifaddr "$if" || true)"
+    if ! [ -z "$ip" ] ; then
+        echo "$if: $ip"
+        if [ -z "$suggested_ip" ] ; then
+            suggested_ip="$ip"
+        else
+            suggested_ip="{IP}"
+        fi
     fi
 done
 
