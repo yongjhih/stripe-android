@@ -67,9 +67,12 @@ module Yoyo
       @ssh_root ||= ssh!('root')
     end
 
+    def ssh_known_hosts_file
+      File.expand_path('~/.ssh/known_hosts-yoyo')
+    end
+
     def ssh!(user)
       log.debug "Starting SSH connection for #{user}"
-      ssh_known_hosts_file = File.expand_path('~/.ssh/known_hosts-yoyo')
       begin
         SpaceCommander::SSH::Connection.new(user, ip_address,
           :user_known_hosts_file => ssh_known_hosts_file)
@@ -120,6 +123,10 @@ module Yoyo
       ssh.check_call_shell! 'rm ~/.ssh/authorized_keys'
       ssh_root.check_call!(%w{systemsetup -setremotelogin off},
                            :input => "yes\n")
+      log.info("\n\nDisabled SSH access on the remote machine - deleting the local known_hosts entry...")
+      entries = File.readlines(ssh_known_hosts_file)
+      entries.reject! { |entry| entry =~ /^#{ip_address} / }
+      File.write(ssh_known_hosts_file, entries.join("\n"))
       log.info("Done!")
     end
 
