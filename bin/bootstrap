@@ -12,8 +12,12 @@ if [ "$(id -u)" -eq 0 ]; then
     exit 1
 fi
 
-# install software updates (specifically so we get OS X 10.9.2+):
-run sudo softwareupdate --install --recommended
+# install software updates (specifically so we get OS X 10.9.2+), but
+# only once:
+if ! sudo softwareupdate --schedule | grep '^Automatic check is off'; then
+    run sudo softwareupdate --install --all
+    run sudo softwareupdate --schedule on
+fi
 
 # turn on filevault if it's not on
 if ! run fdesetup isactive; then
