@@ -5,25 +5,11 @@ module Yoyo
   class Manager
     attr_reader :ip_address, :username
 
-    def initialize(ip_address, username, full_name=nil)
+    def initialize(ip_address, username)
       @ip_address = ip_address
       @username = username
-      @full_name = full_name
 
-      if full_name
-        log.info("Preparing to spin up #{ip_address} for #{user_full_email}")
-      else
-        log.info("Preparing to spin up #{ip_address}")
-      end
-    end
-
-    def full_name
-      @full_name or raise ArgumentError.new(
-        "full_name was not provided when this Manager was initialized")
-    end
-
-    def user_full_email
-      "#{full_name} <#{username}@stripe.com>"
+      log.info("Preparing to spin up #{username}@#{ip_address}")
     end
 
     def log

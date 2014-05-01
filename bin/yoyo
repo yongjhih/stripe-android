@@ -11,7 +11,7 @@ Commands:
 
     init-ssh IP_ADDRESS USERNAME
 
-    spinup IP_ADDRESS USERNAME FULL_NAME
+    spinup IP_ADDRESS USERNAME
 
     cleanup IP_ADDRESS USERNAME
 
@@ -19,8 +19,8 @@ Commands:
   return 1
 end
 
-def spinup(ip_address, username, full_name)
-  mgr = Yoyo::Manager.new(ip_address, username, full_name)
+def spinup(ip_address, username)
+  mgr = Yoyo::Manager.new(ip_address, username)
   mgr.spin_up!
 end
 
@@ -39,7 +39,7 @@ end
 def parse_args(args)
   case args.first
   when 'spinup'
-    return usage unless args.length == 4
+    return usage unless args.length == 3
     spinup(*args[1..-1])
   when 'init-ssh'
     return usage unless args.length == 3
