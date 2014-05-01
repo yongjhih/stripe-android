@@ -56,8 +56,11 @@ done
 echo "SSH key fingerprint:"
 ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
 
-echo "Please run \`yoyo init-ssh $suggested_ip $USER\` on the credentialer machine"
-read -p "Press enter when finished..." ans
+echo "Please run \`yoyo init-ssh $suggested_ip $USER\` on the credentialer machine..."
+echo "(Waiting for you to run that command...)"
+while ! [ -f ~/.ssh/authorized_keys ] ; do
+    sleep 1
+done
 
 run sudo mkdir -vp ~root/.ssh
 run sudo cp -v ~/.ssh/authorized_keys ~root/.ssh/
@@ -66,7 +69,4 @@ trap - EXIT
 
 echo "Yoyo is now set up and ready to run!"
 
-# Fairly terrible, but apparently this is the easiest way to read a
-# user's full name on OS X:
-fullname="$(dscacheutil -q user -a name "$USER" | /usr/bin/sed -e '/^gecos: /s/^gecos: // p' -e 'd')"
-echo "Please run \`yoyo spinup $suggested_ip $USER '$fullname'\` on the credentialer machine"
+echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine"
