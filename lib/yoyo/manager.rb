@@ -50,18 +50,18 @@ module Yoyo
     end
 
     def ssh_root
-      @ssh_root ||= ssh!('root')
+      @ssh_root ||= ssh!('root', :keys_only => true, :auth_methods => %w{publickey})
     end
 
     def ssh_known_hosts_file
       File.expand_path('~/.ssh/known_hosts-yoyo')
     end
 
-    def ssh!(user)
+    def ssh!(user, opts={})
       log.debug "Starting SSH connection for #{user}"
       begin
         SpaceCommander::SSH::Connection.new(user, ip_address,
-          :user_known_hosts_file => ssh_known_hosts_file)
+          opts.merge(:user_known_hosts_file => ssh_known_hosts_file))
       rescue Net::SSH::HostKeyUnknown => err
         fingerprint = ssh_prompt_for_fingerprint
         if fingerprint == err.fingerprint
@@ -94,6 +94,13 @@ module Yoyo
       colons
     end
 
+    def keys_deployed?
+      ssh_root.check_call!(%w{true})
+      true
+    rescue Net::SSH::AuthenticationFailed
+      false
+    end
+
     def deploy_authorized_keys!
       log.info("Deploying #{local_ssh_pubkey} to target authorized_keys")
       pubkey = File.read(local_ssh_pubkey)
@@ -101,6 +108,10 @@ module Yoyo
       dir = File.join(target_home, '.ssh')
       ssh.check_call! %W{mkdir -vp #{dir}}
       ssh.file_write(File.join(dir, 'authorized_keys'), pubkey)
+      until keys_deployed?
+        log.debug("Root is not yet authorized. Waiting...")
+        sleep 1
+      end
     end
 
     def disable_ssh!

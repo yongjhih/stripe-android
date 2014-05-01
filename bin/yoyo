@@ -21,6 +21,7 @@ end
 
 def spinup(ip_address, username)
   mgr = Yoyo::Manager.new(ip_address, username)
+  mgr.deploy_authorized_keys! unless mgr.keys_deployed?
   mgr.spin_up!
 end
 
