@@ -1,0 +1,493 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		565A79CB1912E4BB00F3AFE3 /* bootstrap in Resources */ = {isa = PBXBuildFile; fileRef = 565A79CA1912E4BB00F3AFE3 /* bootstrap */; };
+		56E1B3611912D99700721DEF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E1B3601912D99700721DEF /* Cocoa.framework */; };
+		56E1B36B1912D99700721DEF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 56E1B3691912D99700721DEF /* InfoPlist.strings */; };
+		56E1B36D1912D99700721DEF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E1B36C1912D99700721DEF /* main.m */; };
+		56E1B3711912D99700721DEF /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 56E1B36F1912D99700721DEF /* Credits.rtf */; };
+		56E1B3741912D99700721DEF /* STPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E1B3731912D99700721DEF /* STPAppDelegate.m */; };
+		56E1B3771912D99700721DEF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E1B3751912D99700721DEF /* MainMenu.xib */; };
+		56E1B3791912D99700721DEF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56E1B3781912D99700721DEF /* Images.xcassets */; };
+		56E1B3801912D99700721DEF /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E1B37F1912D99700721DEF /* XCTest.framework */; };
+		56E1B3811912D99700721DEF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E1B3601912D99700721DEF /* Cocoa.framework */; };
+		56E1B3891912D99700721DEF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 56E1B3871912D99700721DEF /* InfoPlist.strings */; };
+		56E1B38B1912D99700721DEF /* Marionette_BootstrapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E1B38A1912D99700721DEF /* Marionette_BootstrapTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		56E1B3821912D99700721DEF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 56E1B3551912D99600721DEF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56E1B35C1912D99700721DEF;
+			remoteInfo = "Marionette Bootstrap";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		565A79CA1912E4BB00F3AFE3 /* bootstrap */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = bootstrap; path = ../../bin/bootstrap; sourceTree = "<group>"; };
+		56E1B35D1912D99700721DEF /* Marionette Bootstrap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Marionette Bootstrap.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		56E1B3601912D99700721DEF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		56E1B3631912D99700721DEF /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		56E1B3641912D99700721DEF /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		56E1B3651912D99700721DEF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		56E1B3681912D99700721DEF /* Marionette Bootstrap-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Marionette Bootstrap-Info.plist"; sourceTree = "<group>"; };
+		56E1B36A1912D99700721DEF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		56E1B36C1912D99700721DEF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		56E1B36E1912D99700721DEF /* Marionette Bootstrap-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Marionette Bootstrap-Prefix.pch"; sourceTree = "<group>"; };
+		56E1B3701912D99700721DEF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		56E1B3721912D99700721DEF /* STPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STPAppDelegate.h; sourceTree = "<group>"; };
+		56E1B3731912D99700721DEF /* STPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STPAppDelegate.m; sourceTree = "<group>"; };
+		56E1B3761912D99700721DEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		56E1B3781912D99700721DEF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		56E1B37E1912D99700721DEF /* Marionette BootstrapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Marionette BootstrapTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		56E1B37F1912D99700721DEF /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		56E1B3861912D99700721DEF /* Marionette BootstrapTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Marionette BootstrapTests-Info.plist"; sourceTree = "<group>"; };
+		56E1B3881912D99700721DEF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		56E1B38A1912D99700721DEF /* Marionette_BootstrapTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Marionette_BootstrapTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		56E1B35A1912D99700721DEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56E1B3611912D99700721DEF /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56E1B37B1912D99700721DEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56E1B3811912D99700721DEF /* Cocoa.framework in Frameworks */,
+				56E1B3801912D99700721DEF /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		56E1B3541912D99600721DEF = {
+			isa = PBXGroup;
+			children = (
+				565A79CA1912E4BB00F3AFE3 /* bootstrap */,
+				56E1B3661912D99700721DEF /* Marionette Bootstrap */,
+				56E1B3841912D99700721DEF /* Marionette BootstrapTests */,
+				56E1B35F1912D99700721DEF /* Frameworks */,
+				56E1B35E1912D99700721DEF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		56E1B35E1912D99700721DEF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B35D1912D99700721DEF /* Marionette Bootstrap.app */,
+				56E1B37E1912D99700721DEF /* Marionette BootstrapTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		56E1B35F1912D99700721DEF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B3601912D99700721DEF /* Cocoa.framework */,
+				56E1B37F1912D99700721DEF /* XCTest.framework */,
+				56E1B3621912D99700721DEF /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		56E1B3621912D99700721DEF /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B3631912D99700721DEF /* AppKit.framework */,
+				56E1B3641912D99700721DEF /* CoreData.framework */,
+				56E1B3651912D99700721DEF /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		56E1B3661912D99700721DEF /* Marionette Bootstrap */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B3721912D99700721DEF /* STPAppDelegate.h */,
+				56E1B3731912D99700721DEF /* STPAppDelegate.m */,
+				56E1B3751912D99700721DEF /* MainMenu.xib */,
+				56E1B3781912D99700721DEF /* Images.xcassets */,
+				56E1B3671912D99700721DEF /* Supporting Files */,
+			);
+			path = "Marionette Bootstrap";
+			sourceTree = "<group>";
+		};
+		56E1B3671912D99700721DEF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B3681912D99700721DEF /* Marionette Bootstrap-Info.plist */,
+				56E1B3691912D99700721DEF /* InfoPlist.strings */,
+				56E1B36C1912D99700721DEF /* main.m */,
+				56E1B36E1912D99700721DEF /* Marionette Bootstrap-Prefix.pch */,
+				56E1B36F1912D99700721DEF /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		56E1B3841912D99700721DEF /* Marionette BootstrapTests */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B38A1912D99700721DEF /* Marionette_BootstrapTests.m */,
+				56E1B3851912D99700721DEF /* Supporting Files */,
+			);
+			path = "Marionette BootstrapTests";
+			sourceTree = "<group>";
+		};
+		56E1B3851912D99700721DEF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				56E1B3861912D99700721DEF /* Marionette BootstrapTests-Info.plist */,
+				56E1B3871912D99700721DEF /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		56E1B35C1912D99700721DEF /* Marionette Bootstrap */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 56E1B38E1912D99700721DEF /* Build configuration list for PBXNativeTarget "Marionette Bootstrap" */;
+			buildPhases = (
+				56E1B3591912D99700721DEF /* Sources */,
+				56E1B35A1912D99700721DEF /* Frameworks */,
+				56E1B35B1912D99700721DEF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Marionette Bootstrap";
+			productName = "Marionette Bootstrap";
+			productReference = 56E1B35D1912D99700721DEF /* Marionette Bootstrap.app */;
+			productType = "com.apple.product-type.application";
+		};
+		56E1B37D1912D99700721DEF /* Marionette BootstrapTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 56E1B3911912D99700721DEF /* Build configuration list for PBXNativeTarget "Marionette BootstrapTests" */;
+			buildPhases = (
+				56E1B37A1912D99700721DEF /* Sources */,
+				56E1B37B1912D99700721DEF /* Frameworks */,
+				56E1B37C1912D99700721DEF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				56E1B3831912D99700721DEF /* PBXTargetDependency */,
+			);
+			name = "Marionette BootstrapTests";
+			productName = "Marionette BootstrapTests";
+			productReference = 56E1B37E1912D99700721DEF /* Marionette BootstrapTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		56E1B3551912D99600721DEF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = STP;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = Stripe;
+				TargetAttributes = {
+					56E1B35C1912D99700721DEF = {
+						DevelopmentTeam = Y28TH9SHX7;
+					};
+					56E1B37D1912D99700721DEF = {
+						TestTargetID = 56E1B35C1912D99700721DEF;
+					};
+				};
+			};
+			buildConfigurationList = 56E1B3581912D99600721DEF /* Build configuration list for PBXProject "Marionette Bootstrap" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 56E1B3541912D99600721DEF;
+			productRefGroup = 56E1B35E1912D99700721DEF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				56E1B35C1912D99700721DEF /* Marionette Bootstrap */,
+				56E1B37D1912D99700721DEF /* Marionette BootstrapTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		56E1B35B1912D99700721DEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				565A79CB1912E4BB00F3AFE3 /* bootstrap in Resources */,
+				56E1B36B1912D99700721DEF /* InfoPlist.strings in Resources */,
+				56E1B3791912D99700721DEF /* Images.xcassets in Resources */,
+				56E1B3711912D99700721DEF /* Credits.rtf in Resources */,
+				56E1B3771912D99700721DEF /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56E1B37C1912D99700721DEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56E1B3891912D99700721DEF /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		56E1B3591912D99700721DEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56E1B3741912D99700721DEF /* STPAppDelegate.m in Sources */,
+				56E1B36D1912D99700721DEF /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56E1B37A1912D99700721DEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56E1B38B1912D99700721DEF /* Marionette_BootstrapTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		56E1B3831912D99700721DEF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56E1B35C1912D99700721DEF /* Marionette Bootstrap */;
+			targetProxy = 56E1B3821912D99700721DEF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		56E1B3691912D99700721DEF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				56E1B36A1912D99700721DEF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		56E1B36F1912D99700721DEF /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				56E1B3701912D99700721DEF /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		56E1B3751912D99700721DEF /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				56E1B3761912D99700721DEF /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		56E1B3871912D99700721DEF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				56E1B3881912D99700721DEF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		56E1B38C1912D99700721DEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		56E1B38D1912D99700721DEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		56E1B38F1912D99700721DEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
+				INFOPLIST_FILE = "Marionette Bootstrap/Marionette Bootstrap-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		56E1B3901912D99700721DEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
+				INFOPLIST_FILE = "Marionette Bootstrap/Marionette Bootstrap-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		56E1B3921912D99700721DEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Marionette Bootstrap.app/Contents/MacOS/Marionette Bootstrap";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Marionette BootstrapTests/Marionette BootstrapTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		56E1B3931912D99700721DEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Marionette Bootstrap.app/Contents/MacOS/Marionette Bootstrap";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
+				INFOPLIST_FILE = "Marionette BootstrapTests/Marionette BootstrapTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		56E1B3581912D99600721DEF /* Build configuration list for PBXProject "Marionette Bootstrap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56E1B38C1912D99700721DEF /* Debug */,
+				56E1B38D1912D99700721DEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		56E1B38E1912D99700721DEF /* Build configuration list for PBXNativeTarget "Marionette Bootstrap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56E1B38F1912D99700721DEF /* Debug */,
+				56E1B3901912D99700721DEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		56E1B3911912D99700721DEF /* Build configuration list for PBXNativeTarget "Marionette BootstrapTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56E1B3921912D99700721DEF /* Debug */,
+				56E1B3931912D99700721DEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 56E1B3551912D99600721DEF /* Project object */;
+}
