@@ -56,7 +56,7 @@ done
 echo "SSH key fingerprint:"
 ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
 
-echo "Please run \`yoyo init-ssh $suggested_ip $USER\` on the credentialer machine..."
+echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine..."
 echo "(Waiting for you to run that command...)"
 while ! [ -f ~/.ssh/authorized_keys ] ; do
     sleep 1
@@ -67,6 +67,4 @@ run sudo cp -v ~/.ssh/authorized_keys ~root/.ssh/
 
 trap - EXIT
 
-echo "Yoyo is now set up and ready to run!"
-
-echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine"
+echo "Yoyo is now set up and running!"
