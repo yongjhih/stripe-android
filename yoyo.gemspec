@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'subprocess'
   spec.add_dependency 'space-commander'
   spec.add_dependency 'highline'
+  spec.add_dependency 'mail'
 end

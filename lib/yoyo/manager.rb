@@ -21,6 +21,7 @@ module Yoyo
 
       step_classes = [
         Yoyo::Steps::Marionette,
+        Yoyo::Steps::GenerateCredentials
       ]
 
       step_classes.each do |klass|
