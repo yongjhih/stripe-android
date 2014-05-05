@@ -29,6 +29,7 @@ PATH
   remote: .
   specs:
     yoyo (0.0.1)
+      chalk-cli
       docile (~> 1.1)
       highline
       mail
@@ -45,6 +46,9 @@ GEM
       nokogiri (>= 1.4.4, < 1.6.0)
       uuidtools (~> 2.1)
     builder (3.2.2)
+    chalk-cli (0.0.2)
+      chalk-log
+      trollop
     chalk-log (0.0.12)
       logging
     chalk-tools (0.0.12)
@@ -114,6 +118,7 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
+    trollop (2.0)
     uuidtools (2.1.4)
 
 PLATFORMS

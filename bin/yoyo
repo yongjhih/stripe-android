@@ -1,7 +1,39 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
 require_relative '../lib/yoyo'
+require 'chalk-cli'
+
+class Spinup < Chalk::CLI::Command
+  def invoke
+    if arguments.length != 3
+      usage
+      return false
+    end
+    command_name, ip_address, username = arguments
+
+    mgr = Yoyo::Manager.new(ip_address, username)
+    mgr.deploy_authorized_keys! unless mgr.keys_deployed?
+    mgr.spin_up!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} spinup [OPTIONS] IP USERNAME')
+  App.options do |opts|
+    opts.opt :no_certs, "Skip the certificate-generation step (for spinning up a second/replacement machine for an existing stripe)",
+             :short => 'n', :default => false
+  end
+  App.action(self)
+end
+
+class Cleanup < Chalk::CLI::Command
+  def invoke
+    command_name, ip_address, username = arguments
+    mgr = Yoyo::Manager.new(ip_address, username)
+    mgr.disable_ssh!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} cleanup IP USERNAME')
+  App.action(self)
+end
 
 def usage
   $stderr.puts <<-EOM
@@ -9,9 +41,7 @@ usage: #{File.basename($0)} COMMAND [ARGS...]
 
 Commands:
 
-    init-ssh IP_ADDRESS USERNAME
-
-    spinup IP_ADDRESS USERNAME
+    spinup [options] IP_ADDRESS USERNAME
 
     cleanup IP_ADDRESS USERNAME
 
@@ -19,35 +49,12 @@ Commands:
   return 1
 end
 
-def spinup(ip_address, username)
-  mgr = Yoyo::Manager.new(ip_address, username)
-  mgr.deploy_authorized_keys! unless mgr.keys_deployed?
-  mgr.spin_up!
-end
-
-def init_ssh(ip_address, username)
-  mgr = Yoyo::Manager.new(ip_address, username)
-  mgr.deploy_authorized_keys!
-  mgr.log.info('Done!')
-end
-
-def cleanup(ip_address, username)
-  mgr = Yoyo::Manager.new(ip_address, username)
-  mgr.disable_ssh!
-end
-
-
 def parse_args(args)
   case args.first
   when 'spinup'
-    return usage unless args.length == 3
-    spinup(*args[1..-1])
-  when 'init-ssh'
-    return usage unless args.length == 3
-    init_ssh(*args[1..-1])
+    Spinup::App.run_if_invoked(__FILE__)
   when 'cleanup'
-    return usage unless args.length == 3
-    cleanup(*args[1..-1])
+    Spinup::App.run_if_invoked(__FILE__)
   else
     return usage
   end
