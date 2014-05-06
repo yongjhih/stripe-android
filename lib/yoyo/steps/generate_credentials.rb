@@ -64,7 +64,7 @@ And wait for it to print the words of six. Then, enter them here:
 EOM
             fingerprint = ""
             while fingerprint.length < 40
-              fingerprint += Sixword::Lib.decode_6_words($stdin.readline.split(' '), true).to_s(16)
+              fingerprint += "%08x" % Sixword::Lib.decode_6_words($stdin.readline.split(' '), true)
             end
             raise "Fingerprint doesn't look right" unless fingerprint.length == 40
             set_fingerprint(fingerprint)
