@@ -42,12 +42,9 @@ module Yoyo;
 
       def dot_stripe_clean?
         # Any staged but uncommitted changes? Exit status 1 = yep.
-        Subprocess.check_call(%w{git diff-index --quiet HEAD}, :cwd => dot_stripe)
-        # Any unstaged changes? Exit status 1 = yep.
-        Subprocess.check_call(%w{git diff-files --quiet}, :cwd => dot_stripe)
-        true
-      rescue Subprocess::NonZeroExit
-        false
+        Subprocess.call(%w{git diff-index --quiet HEAD}, :cwd => dot_stripe).success? &&
+          # Any unstaged changes? Exit status 1 = yep.
+          Subprocess.call(%w{git diff-files --quiet}, :cwd => dot_stripe).success?
       end
 
       def init_steps
@@ -73,12 +70,7 @@ EOM
 
         step 'gpg-sign their key' do
           complete? do
-            begin
-              Subprocess.check_call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe)
-              true
-            rescue Subprocess::NonZeroExit
-              false
-            end
+            Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe).success?
           end
 
           run do
