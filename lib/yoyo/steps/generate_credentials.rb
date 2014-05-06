@@ -27,8 +27,8 @@ module Yoyo;
               uids = []
               output.each_line do |line|
                 abbrev, rest = line.chomp.split(':', 2)
-                if abbrev == 'uid'
-                  uids << Mail::Address.new(rest.split(':').last)
+                if %w[uid pub].include?(abbrev)
+                  uids << Mail::Address.new(rest.split(':')[8])
                 end
               end
               log.debug("Found UIDs on key: #{uids}")
