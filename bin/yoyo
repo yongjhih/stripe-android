@@ -11,7 +11,7 @@ class Spinup < Chalk::CLI::Command
     end
     command_name, ip_address, username = arguments
 
-    mgr = Yoyo::Manager.new(ip_address, username)
+    mgr = Yoyo::Manager.new(ip_address, username, :no_certs => options[:no_certs])
     mgr.deploy_authorized_keys! unless mgr.keys_deployed?
     mgr.spin_up!
   end

@@ -5,9 +5,10 @@ module Yoyo
   class Manager
     attr_reader :ip_address, :username
 
-    def initialize(ip_address, username)
+    def initialize(ip_address, username, options)
       @ip_address = ip_address
       @username = username
+      @skip_certs = true if options[:no_certs]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end
@@ -21,8 +22,9 @@ module Yoyo
 
       step_classes = [
         Yoyo::Steps::Marionette,
-        Yoyo::Steps::GenerateCredentials
       ]
+      step_classes << Yoyo::Steps::GenerateCredentials unless @skip_certs
+
 
       step_classes.each do |klass|
         log.info('Beginning step list: ' + klass.name)
