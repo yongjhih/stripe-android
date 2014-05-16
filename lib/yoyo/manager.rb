@@ -5,7 +5,7 @@ module Yoyo
   class Manager
     attr_reader :ip_address, :username
 
-    def initialize(ip_address, username, options)
+    def initialize(ip_address, username, options={})
       @ip_address = ip_address
       @username = username
       @skip_certs = true if options[:no_certs]

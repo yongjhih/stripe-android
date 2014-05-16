@@ -54,7 +54,7 @@ def parse_args(args)
   when 'spinup'
     Spinup::App.run_if_invoked(__FILE__)
   when 'cleanup'
-    Spinup::App.run_if_invoked(__FILE__)
+    Cleanup::App.run_if_invoked(__FILE__)
   else
     return usage
   end
