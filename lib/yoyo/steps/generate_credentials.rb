@@ -47,6 +47,13 @@ module Yoyo;
           Subprocess.call(%w{git diff-files --quiet}, :cwd => dot_stripe).success?
       end
 
+      def useful_env
+        env = ENV.to_hash
+        path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
+        env['PATH'] = path
+        env
+      end
+
       def init_steps
         step 'read SSH key' do
           idempotent
@@ -82,7 +89,7 @@ EOM
               path = ENV['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
               Subprocess.check_call(%W{bash -x ./gnupg/sign_gpg_key_with_ca.sh #{fingerprint}},
                                     :cwd => dot_stripe,
-                                    :env => ENV.to_hash.merge('PATH' => path))
+                                    :env => useful_env)
             end
           end
         end
@@ -92,7 +99,7 @@ EOM
 
           run do
             Bundler.with_clean_env do
-              Subprocess.check_call(%w{fetch-stripe-gpg-keys})
+              Subprocess.check_call(%w{fetch-stripe-gpg-keys}, :env => useful_env)
             end
           end
         end
@@ -105,7 +112,7 @@ EOM
           run do
             Bundler.with_clean_env do
               Subprocess.check_call(%W{./stripe.vpn/add_certs.sh #{stripe_email.local} #{stripe_email.name}},
-                                    :cwd => dot_stripe)
+                                    :cwd => dot_stripe, :env => useful_env)
             end
           end
         end
