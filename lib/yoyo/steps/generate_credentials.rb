@@ -55,7 +55,15 @@ module Yoyo;
       end
 
       def init_steps
-        step 'read SSH key' do
+        step 'write sentinel file' do
+          idempotent
+
+          run do
+            mgr.ssh.file_write('/etc/stripe/yoyo/credentials.generate', 'yes')
+          end
+        end
+
+        step 'read GPG fingerprint' do
           idempotent
 
           run do

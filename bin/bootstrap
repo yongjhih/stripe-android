@@ -6,6 +6,13 @@ run() {
     "$@"
 }
 
+wait_for_file() {
+    echo "- Waiting for $1..."
+    while ! [ -f "$1" ] ; do
+        sleep 1
+    done
+}
+
 # we shouldn't be root when running this
 if [ "$(id -u)" -eq 0 ]; then
     echo "error: this script should not be run as root"
@@ -58,13 +65,20 @@ ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
 
 echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine..."
 echo "(Waiting for you to run that command...)"
-while ! [ -f ~/.ssh/authorized_keys ] ; do
-    sleep 1
-done
+wait_for_file ~/.ssh/authorized_keys
 
 run sudo mkdir -vp ~root/.ssh
 run sudo cp -v ~/.ssh/authorized_keys ~root/.ssh/
 
 trap - EXIT
-
 echo "Yoyo is now set up and running!"
+cat <<EOF
+I'll now wait for the credentials sentinel file. If you won't generate
+credentials for this machine, you can press Ctrl+C now.
+EOF
+wait_for_file /etc/stripe/yoyo/credentials.generate
+run /usr/local/stripe/bin/generate-stripe-keys
+
+wait_for_file ~/Desktop/certs.tar.gz.gpg
+run /usr/local/stripe/bin/import-vpn-keys ~/Desktop/certs.tar.gz.gpg
+echo "All done! Thanks for your patience!"
