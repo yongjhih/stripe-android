@@ -59,7 +59,7 @@ module Yoyo;
           idempotent
 
           run do
-            mgr.ssh.file_write('/etc/stripe/yoyo/credentials.generate', 'yes')
+            mgr.ssh_root.file_write('/etc/stripe/yoyo/credentials.generate', 'yes')
           end
         end
 
