@@ -15,6 +15,11 @@ module Yoyo;
         @fingerprint = fpr
       end
 
+      def set_ssh_key(ssh_key)
+        @ssh_key = ssh_key
+      end
+
+      attr_reader :ssh_key
       attr_reader :fingerprint
 
       def stripe_email
@@ -40,11 +45,23 @@ module Yoyo;
         @stripe_email
       end
 
-      def dot_stripe_clean?
+      def git_dir_clean?(dir)
         # Any staged but uncommitted changes? Exit status 1 = yep.
-        Subprocess.call(%w{git diff-index --quiet HEAD}, :cwd => dot_stripe).success? &&
+        Subprocess.call(%w{git diff-index --quiet HEAD}, :cwd => dir).success? &&
           # Any unstaged changes? Exit status 1 = yep.
-          Subprocess.call(%w{git diff-files --quiet}, :cwd => dot_stripe).success?
+          Subprocess.call(%w{git diff-files --quiet}, :cwd => dir).success?
+      end
+
+      def dot_stripe_clean?
+        git_dir_clean?(dot_stripe)
+      end
+
+      def puppet_auth_config
+        File.expand_path('~/stripe/puppet-config/yaml/auth.yaml')
+      end
+
+      def puppet_users_list
+        YAML.load_file(puppet_auth_config)
       end
 
       def useful_env
@@ -85,12 +102,12 @@ EOM
 
         step 'gpg-sign their key' do
           complete? do
-            Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe).success?
+            Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe, :env => useful_env).success?
           end
 
           run do
             raise "~/.stripe has uncommitted stuff in it! Clean it up, please!" unless dot_stripe_clean?
-            Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe)
+            Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe, :env => useful_env)
 
             space_commander = File.expand_path("~/stripe/space-commander/bin")
             Bundler.with_clean_env do
@@ -163,9 +180,56 @@ EOM
           end
         end
 
-        # step 'add GPG-signed SSH key to puppet' do
-        #
-        # end
+        step 'read GPG-signed SSH key' do
+          idempotent
+
+          run do
+            verifier = GPGVerifier.new()
+            verifier.read_ascii_armor_data
+            if stripe_email.to_s != verifier.signature_address.to_s
+              raise "The GPG data isn't signed by #{stripe_email.to_s}; " +
+                    "it's signed by #{verifier.signature_address.to_s}"
+            end
+            if fingerprint.upcase != verifier.signature_fpr.upcase
+              raise "The GPG data isn't signed by #{fingerprint.upcase}; " +
+                    "it's signed by #{verifier.signature_fpr.upcase}"
+            end
+            set_ssh_key(verifier.data.rstrip)
+          end
+        end
+
+        step 'add user entry to puppet' do
+          complete? do
+            users = puppet_users_list
+            users.fetch('auth::users').fetch(stripe_email.local, nil)
+          end
+
+          run do
+            users = puppet_users_list
+            users.fetch('auth::users')[stripe_email.local] = {
+              name: stripe_email.name,
+              pubkeys: [],
+              privileges: ['password-vault']
+            }
+            File.write(puppet_auth_config, users.to_yaml)
+          end
+        end
+
+        step 'add SSH key to puppet' do
+          complete? do
+            users = puppet_users_list['auth::users']
+            if user_entry = users.fetch(stripe_email.local)
+              user_entry.fetch(:pubkeys).include?(ssh_key)
+            end
+
+          end
+
+          run do
+            users = puppet_users_list
+            users['auth::users'].fetch(stripe_email.local)[:pubkeys] << ssh_key
+            File.write(puppet_auth_config, users.to_yaml)
+          end
+        end
       end
     end
   end
