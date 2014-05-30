@@ -32,9 +32,7 @@ module Yoyo
     def read_ascii_armor_data
       log.info "Please paste the OpenPGP block from the email you just got:"
       read, write = IO.pipe
-      log.debug("Write FD number is #{write.to_i}")
       gpg_command = %W{gpg --no-verbose --quiet --no-tty --status-fd #{write.to_i}}
-      log.debug("Running #{gpg_command}")
       verify_result = ""
       data = ""
       process = Subprocess.check_call(gpg_command,
