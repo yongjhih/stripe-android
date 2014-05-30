@@ -180,6 +180,17 @@ EOM
           end
         end
 
+        step 'ensure puppet dir is clean' do
+          idempotent
+
+          run do
+            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
+            unless git_dir_clean?(puppet_dir)
+              raise "Puppet directory isn't clean. Please clean it up & re-run yoyo"
+            end
+          end
+        end
+
         step 'read GPG-signed SSH key' do
           idempotent
 
