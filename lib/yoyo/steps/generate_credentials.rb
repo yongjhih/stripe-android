@@ -220,7 +220,7 @@ EOM
             users.fetch('auth::users')[stripe_email.local] = {
               name: stripe_email.name,
               pubkeys: [],
-              privileges: ['password-vault']
+              privileges: mgr.puppet_groups
             }
             File.write(puppet_auth_config, users.to_yaml)
           end

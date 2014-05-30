@@ -3,12 +3,13 @@ require 'space-commander'
 
 module Yoyo
   class Manager
-    attr_reader :ip_address, :username
+    attr_reader :ip_address, :username, :puppet_groups
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
       @username = username
       @skip_certs = true if options[:no_certs]
+      @puppet_groups = options[:groups]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end

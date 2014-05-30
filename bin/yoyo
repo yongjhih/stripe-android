@@ -4,14 +4,17 @@ require_relative '../lib/yoyo'
 require 'chalk-cli'
 
 class Spinup < Chalk::CLI::Command
+  NECESSARY_GROUPS=%w{password-vault}
+
   def invoke
     if arguments.length != 3
       usage
       return false
     end
     command_name, ip_address, username = arguments
+    groups = NECESSARY_GROUPS + options[:groups].split(/,\s*/)
 
-    mgr = Yoyo::Manager.new(ip_address, username, :no_certs => options[:no_certs])
+    mgr = Yoyo::Manager.new(ip_address, username, :no_certs => options[:no_certs], :groups => groups)
     mgr.deploy_authorized_keys! unless mgr.keys_deployed?
     mgr.spin_up!
   end
@@ -20,6 +23,8 @@ class Spinup < Chalk::CLI::Command
   App.options do |opts|
     opts.opt :no_certs, "Skip the certificate-generation step (for spinning up a second/replacement machine for an existing stripe)",
              :short => 'n', :default => false
+    opts.opt :groups, "Add the user to these permission groups in puppet (separated by commas)",
+             :short => 'g', :default => "devbox"
   end
   App.action(self)
 end
