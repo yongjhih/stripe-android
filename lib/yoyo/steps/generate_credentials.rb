@@ -80,6 +80,19 @@ module Yoyo;
           end
         end
 
+        step 'Ask to copy GPG across (for existing stripes)' do
+          complete? do
+            ! mgr.gpg_key
+          end
+
+          run do
+            log.info <<-EOM
+Marionetting complete. Now copy the new stripe's existing GPG key over
+to the new machine.
+EOM
+          end
+        end
+
         step 'read GPG fingerprint' do
           idempotent
 
@@ -101,6 +114,7 @@ EOM
 
         step 'gpg-sign their key' do
           complete? do
+            return true if mgr.gpg_key
             Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe, :env => useful_env).success?
           end
 
