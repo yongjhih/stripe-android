@@ -13,7 +13,7 @@ module Yoyo; module Steps
                                   mgr.username + "\n")
           mgr.ssh_root.file_write('/etc/stripe/facts/certname.txt',
                                   mgr.target_certname + "\n")
-          if mgr.skip_gpg
+          if mgr.gpg_key
             mgr.ssh_root.file_write('/etc/stripe/facts/no_gpg.txt',
                                     mgr.gpg_key + "\n")
           end
