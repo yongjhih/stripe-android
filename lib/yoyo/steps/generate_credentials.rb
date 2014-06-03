@@ -85,11 +85,10 @@ module Yoyo;
 
           run do
             log.info <<-EOM
-Seems like Marionetting worked! Congrats! Now, on the target machine, run:
+Seems like Marionetting worked! Congrats! The target machine will now
+generate a GPG and SSH key.
 
-     /usr/local/stripe/bin/generate-stripe-keys [stripe-username]@stripe.com
-
-And wait for it to print the words of six. Then, enter them here:
+Wait for it to print the words of six. Then, enter them here:
 EOM
             fingerprint = ""
             while fingerprint.length < 40
