@@ -114,8 +114,8 @@ EOM
 
         step 'gpg-sign their key' do
           complete? do
-            return true if mgr.gpg_key
-            Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe, :env => useful_env).success?
+            mgr.gpg_key ||
+              Subprocess.call(%W{./gnupg/is_key_signed.sh #{fingerprint}}, :cwd => dot_stripe, :env => useful_env).success?
           end
 
           run do
@@ -149,8 +149,10 @@ EOM
 
           run do
             Bundler.with_clean_env do
-              Subprocess.check_call(%W{./stripe.vpn/add_certs.sh #{stripe_email.local} #{stripe_email.name}},
-                                    :cwd => dot_stripe, :env => useful_env)
+              cmdline = %w{./stripe.vpn/add_certs.sh}
+              cmdline += %w{-a} if mgr.gpg_key # default to not revoking vpn certs for a second machine
+              cmdline += [stripe_email.local, stripe_email.name]
+              Subprocess.check_call(cmdline, :cwd => dot_stripe, :env => useful_env)
             end
           end
         end

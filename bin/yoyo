@@ -14,10 +14,13 @@ class Spinup < Chalk::CLI::Command
     command_name, ip_address, username = arguments
     groups = NECESSARY_GROUPS + options[:groups].split(/,\s*/)
 
-    mgr = Yoyo::Manager.new(ip_address, username,
-                            :no_certs => options[:no_certs],
-                            :groups => groups,
-                            :gpg_key => options[:gpg_key])
+    args = {
+      :no_certs => options[:no_certs],
+      :groups => groups,
+      :gpg_key => options[:gpg_key]
+    }
+
+    mgr = Yoyo::Manager.new(ip_address, username, args)
     mgr.deploy_authorized_keys! unless mgr.keys_deployed?
     mgr.spin_up!
   end
@@ -27,9 +30,9 @@ class Spinup < Chalk::CLI::Command
     opts.opt :no_certs, "Skip the certificate-generation step (for spinning up contractor machines)",
              :short => 'n', :default => false
     opts.opt :groups, "Add the user to these permission groups in puppet (separated by commas)",
-             :short => 'g', :default => "devbox"
-    opts.opt :'gpg-key', "Assume this GPG fingerprint is the existing key",
-             :short => 'c', :default => false
+             :short => 'g', :type => :string, :default => "devbox"
+    opts.opt :gpg_key, "Assume this GPG fingerprint is the existing key",
+             :type => :string, :short => 'c', :default => nil
   end
   App.action(self)
 end
