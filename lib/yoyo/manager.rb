@@ -3,11 +3,12 @@ require 'space-commander'
 
 module Yoyo
   class Manager
-    attr_reader :ip_address, :username, :puppet_groups, :gpg_key
+    attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
       @username = username
+      @stripe_username = options[:stripe_user]
       @skip_certs = true if options[:no_certs]
       @gpg_key = options[:gpg_key]
       @puppet_groups = options[:groups]

@@ -11,6 +11,10 @@ module Yoyo; module Steps
           mgr.ssh_root.check_call! %w{mkdir -p /etc/stripe/facts}
           mgr.ssh_root.file_write('/etc/stripe/facts/user.txt',
                                   mgr.username + "\n")
+          if mgr.stripe_username
+            mgr.ssh_root.file_write('/etc/stripe/facts/username.txt',
+                                    mgr.stripe_username + "\n")
+          end
           mgr.ssh_root.file_write('/etc/stripe/facts/certname.txt',
                                   mgr.target_certname + "\n")
           if mgr.gpg_key

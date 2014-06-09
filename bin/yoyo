@@ -17,7 +17,8 @@ class Spinup < Chalk::CLI::Command
     args = {
       :no_certs => options[:no_certs],
       :groups => groups,
-      :gpg_key => options[:gpg_key]
+      :gpg_key => options[:gpg_key],
+      :stripe_user => options[:stripe_user]
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
@@ -33,6 +34,8 @@ class Spinup < Chalk::CLI::Command
              :short => 'g', :type => :string, :default => "devbox"
     opts.opt :gpg_key, "Assume this GPG fingerprint is the existing key",
              :type => :string, :short => 'c', :default => nil
+    opts.opt :stripe_user, 'Stripe username, if different from local username',
+             :short => 's', :type => :string, :default => nil
   end
   App.action(self)
 end
