@@ -83,7 +83,7 @@ module Yoyo;
       # Strip the final comment from the ssh key (this is how the
       # github API stores/returns it)
       def ssh_key_bare
-        ssh_key.chomp.gsub(/\s+\S+\z/, '')
+        ssh_key.chomp.split(/\s+/)[0..1].join(' ')
       end
 
       def init_steps
