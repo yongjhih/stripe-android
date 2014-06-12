@@ -86,4 +86,9 @@ fi
 
 wait_for_file ~/Desktop/certs.tar.gz.gpg
 run /usr/local/stripe/bin/import-vpn-keys ~/Desktop/certs.tar.gz.gpg
+
+echo "Please attach the 'git' repo thumbdrive now"
+wait_for_file /Volumes/git/clone-all
+run /Volumes/git/clone-all
+
 echo "All done! Thanks for your patience!"
