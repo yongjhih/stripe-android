@@ -28,8 +28,7 @@ fi
 
 # turn on filevault if it's not on
 if ! run fdesetup isactive; then
-    echo "Full disk encryption is not active"
-    read -p "Press enter to immediately restart to enable..." ans
+    echo "Full disk encryption is not active. Enabling (this will reboot)..."
     run sudo fdesetup enable -user $USER -forcerestart
 fi
 
