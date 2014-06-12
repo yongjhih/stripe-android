@@ -166,6 +166,7 @@ EOM
             Bundler.with_clean_env do
               cmdline = %w{./stripe.vpn/add_certs.sh}
               cmdline += %w{-a} if mgr.gpg_key # default to not revoking vpn certs for a second machine
+              cmdline += %W{-k #{fingerprint}}
               cmdline += [stripe_email.local, stripe_email.name]
               Subprocess.check_call(cmdline, :cwd => dot_stripe, :env => useful_env)
             end
