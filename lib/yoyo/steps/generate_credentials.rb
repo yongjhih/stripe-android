@@ -1,5 +1,6 @@
 require 'sixword'
 require 'mail'
+require 'octokit'
 
 # I debug things:
 require 'pry'
@@ -69,6 +70,20 @@ module Yoyo;
         path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
         env['PATH'] = path
         env
+      end
+
+      def github_client
+        @client ||=
+          begin
+            secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
+            Octokit::Client.new(:oauth_token => secret['auth_token'])
+          end
+      end
+
+      # Strip the final comment from the ssh key (this is how the
+      # github API stores/returns it)
+      def ssh_key_bare
+        ssh_key.chomp.gsub(/\s+\S+\z/, '')
       end
 
       def init_steps
@@ -254,6 +269,41 @@ EOM
             users = puppet_users_list
             users['auth::users'].fetch(stripe_email.local)[:pubkeys] << ssh_key
             File.write(puppet_auth_config, users.to_yaml)
+          end
+        end
+
+        step 'Add SSH key to github' do
+          complete? do
+            keys = github_client.keys
+            keys.find { |key_entry| key_entry['key'] == ssh_key_bare }
+          end
+
+          run do
+            github_client.add_key(stripe_email.local, ssh_key)
+          end
+        end
+
+        step 'Clone github repos' do
+          idempotent
+
+          run do
+            if ! mgr.ssh.if_call! %w{test -x /Volumes/git/clone-all}, :quiet => true
+              log.info "Will now clone github repos."
+              log.info "Please insert the git cache thumbdrive into the target machine."
+              until mgr.ssh.if_call! %w{test -x /Volumes/git/clone-all}, :quiet => true
+                sleep 0.3
+              end
+            end
+            mgr.ssh.check_call! %w{/Volumes/git/clone-all}
+          end
+        end
+
+        step 'Remove SSH key from github' do
+          idempotent
+
+          run do
+            the_key = github_client.keys.find { |key| key['key'] == ssh_key_bare }
+            github_client.remove_key(the_key['id'])
           end
         end
       end
