@@ -101,22 +101,38 @@ module Yoyo;
           end
 
           run do
+            key = mgr.gpg_key.gsub(/\s+/, '').downcase
+            unless key.length == 40
+              raise "The GPG fingerprint you gave on the commandline (#{mgr.gpg_key}) does not look like a valid GPG fingerprint!"
+            end
+
             log.info <<-EOM
-Marionetting complete. Now copy the new stripe's existing GPG key over
+
+Marionetting complete. Now copy the Stripe's existing GPG key over
 to the new machine.
+
+Its fingerprint is #{mgr.gpg_key} (normalized: #{key})
+
+I'll wait...
 EOM
+            until mgr.ssh.if_call! %W{/usr/local/bin/gpg --list-secret-keys #{key}}, :quiet => true
+              sleep 10
+            end
+            set_fingerprint(key)
           end
         end
 
         step 'read GPG fingerprint' do
-          idempotent
+          complete? do
+            fingerprint
+          end
 
           run do
             log.info <<-EOM
 Seems like Marionetting worked! Congrats! The target machine will now
 generate a GPG and SSH key.
 
-Wait for it to print the words of six. Then, enter them here:
+Please enter the words of six here:
 EOM
             fingerprint = ""
             while fingerprint.length < 40
