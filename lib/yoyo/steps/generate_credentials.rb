@@ -120,7 +120,11 @@ Wait for it to print the words of six. Then, enter them here:
 EOM
             fingerprint = ""
             while fingerprint.length < 40
-              fingerprint += "%08x" % Sixword::Lib.decode_6_words($stdin.readline.split(' '), true)
+              begin
+                fingerprint += "%08x" % Sixword::Lib.decode_6_words($stdin.readline.split(' '), true)
+              rescue ArgumentError => e
+                log.error "That was not a valid sixwords line (#{e.to_s}). Retry!"
+              end
             end
             raise "Fingerprint doesn't look right" unless fingerprint.length == 40
             set_fingerprint(fingerprint)
@@ -263,7 +267,6 @@ EOM
             if user_entry = users.fetch(stripe_email.local)
               user_entry.fetch(:pubkeys).include?(ssh_key)
             end
-
           end
 
           run do
