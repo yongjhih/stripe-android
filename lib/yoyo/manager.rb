@@ -67,7 +67,8 @@ module Yoyo
       log.debug "Starting SSH connection for #{user}"
       begin
         SpaceCommander::SSH::Connection.new(user, ip_address,
-          opts.merge(:user_known_hosts_file => ssh_known_hosts_file))
+                                            opts.merge(:user_known_hosts_file => ssh_known_hosts_file,
+                                                       :forward_agent => false))
       rescue Net::SSH::HostKeyUnknown => err
         fingerprint = ssh_prompt_for_fingerprint
         if fingerprint == err.fingerprint

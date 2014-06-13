@@ -16,6 +16,10 @@ module Yoyo;
         @fingerprint = fpr
       end
 
+      def gpg_long_keyid
+        fingerprint[24..-1]
+      end
+
       def set_ssh_key(ssh_key)
         @ssh_key = ssh_key
       end
@@ -66,10 +70,26 @@ module Yoyo;
       end
 
       def useful_env
-        env = ENV.to_hash
-        path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
-        env['PATH'] = path
-        env
+        Bundler.with_clean_env do
+          env = ENV.to_hash
+          path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
+          env['PATH'] = path
+          env
+        end
+      end
+
+      def latest_cert
+        all_certs = Dir.glob(File.expand_path("stripe.vpn/#{stripe_email.local}-[0-9]*.tar.gz.gpg", dot_stripe))
+        all_certs.sort_by { |filename|
+          File.stat(filename).mtime
+        }.last
+      end
+
+      def fingerprint_equivalent_to_key?(keyid)
+        output = Subprocess.check_output(%W{gpg --fingerprint --fingerprint --with-colons #{keyid}})
+        !output.scan(/^fpr:+:#{fingerprint.upcase}:$/).empty?
+      rescue Subprocess::NonZeroExit
+        return false
       end
 
       def github_client
@@ -179,7 +199,13 @@ EOM
 
         step 'generate VPN certs' do
           complete? do
-            !Dir.glob(File.expand_path("stripe.vpn/#{stripe_email.local}-[0-9]*.tar.gz.gpg", dot_stripe)).empty?
+            if latest_cert
+              output = Subprocess.check_output(['gpg', '--no-default-keyring', '--keyring', '/dev/null',
+                                                '--secret-keyring', '/dev/null', '--list-only', '--list-packets',
+                                                '--verbose', latest_cert])
+
+              output.scan(/^:pubkey enc packet: .* keyid (.+)$/).flatten.find { |keyid| fingerprint_equivalent_to_key?(keyid) }
+            end
           end
 
           run do
@@ -219,11 +245,6 @@ EOM
           idempotent
 
           run do
-            all_certs = Dir.glob(File.expand_path("stripe.vpn/#{stripe_email.local}-[0-9]*.tar.gz.gpg", dot_stripe))
-            latest_cert = all_certs.sort_by { |filename|
-              File.stat(filename).mtime
-            }.last
-
             log.debug("Latest cert file we have for this stripe is #{latest_cert}")
 
             mgr.ssh.file_write(File.join('Desktop', 'certs.tar.gz.gpg'), File.read(latest_cert))
@@ -304,17 +325,33 @@ EOM
         end
 
         step 'Clone github repos' do
-          idempotent
+          complete? do
+            mgr.ssh_root.if_call! %w{test -f /etc/stripe/yoyo/repos.initialized}
+          end
 
           run do
-            if ! mgr.ssh.if_call! %w{test -x /Volumes/git/clone-all}, :quiet => true
+            if ! mgr.ssh.if_call! %w{test -x /Volumes/Marionette\ Cache/git/clone-all}, :quiet => true
               log.info "Will now clone github repos."
-              log.info "Please insert the git cache thumbdrive into the target machine."
-              until mgr.ssh.if_call! %w{test -x /Volumes/git/clone-all}, :quiet => true
-                sleep 0.3
+              log.info "Please insert the Marionette Cache thumbdrive into the target machine."
+              until mgr.ssh.if_call! %w{test -x /Volumes/Marionette\ Cache/git/clone-all}, :quiet => true
+                sleep 5
               end
             end
-            mgr.ssh.check_call! %w{/Volumes/git/clone-all}
+            mgr.ssh.check_call! %w{/Volumes/Marionette\ Cache/git/clone-all}
+            mgr.ssh_root.file_write('/etc/stripe/yoyo/repos.initialized', "yes\n")
+          end
+        end
+
+        step 'Add the user to the dot-stripe2 key' do
+          complete? do
+            output = Subprocess.check_output(%w{fetch-password-recipients -r stripe/dot-stripe2-encfs},
+                                              :env => useful_env)
+            output.chomp.split(/\s+/).find { |keyid| fingerprint_equivalent_to_key?(keyid) }
+          end
+
+          run do
+            Subprocess.check_call(%W{add-password-user -r #{gpg_long_keyid} stripe/dot-stripe2-encfs},
+                                  :env => useful_env)
           end
         end
 
@@ -323,7 +360,21 @@ EOM
 
           run do
             the_key = github_client.keys.find { |key| key['key'] == ssh_key_bare }
-            github_client.remove_key(the_key['id'])
+            github_client.remove_key(the_key['id']) if the_key
+          end
+        end
+
+        step 'Run initialize-ssh on the target machine' do
+          idempotent
+
+          run do
+            vault_conn = SpaceCommander::SSH::Connection.new('root', 'vault.stripe.io')
+            host_key = vault_conn.file_read('/etc/ssh/ssh_host_rsa_key.pub')
+
+            vault_port = vault_conn.conn.options[:port]
+            vault_ip = vault_conn.conn.options[:host_name]
+            host_string = "[vault.stripe.io]:#{vault_port},[#{vault_ip}]:#{vault_port} "
+            mgr.ssh_root.file_write('/etc/stripe/yoyo/vault_host_key.pub', host_string + host_key)
           end
         end
       end
