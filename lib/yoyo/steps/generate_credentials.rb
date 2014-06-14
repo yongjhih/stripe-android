@@ -324,21 +324,11 @@ EOM
           end
         end
 
-        step 'Clone github repos' do
-          complete? do
-            mgr.ssh_root.if_call! %w{test -f /etc/stripe/yoyo/repos.initialized}
-          end
+        step 'Kick off cloning github repos' do
+          idempotent
 
           run do
-            if ! mgr.ssh.if_call! %w{test -x /Volumes/Marionette\ Cache/git/clone-all}, :quiet => true
-              log.info "Will now clone github repos."
-              log.info "Please insert the Marionette Cache thumbdrive into the target machine."
-              until mgr.ssh.if_call! %w{test -x /Volumes/Marionette\ Cache/git/clone-all}, :quiet => true
-                sleep 5
-              end
-            end
-            mgr.ssh.check_call! %w{/Volumes/Marionette\ Cache/git/clone-all}
-            mgr.ssh_root.file_write('/etc/stripe/yoyo/repos.initialized', "yes\n")
+            mgr.ssh_root.file_write('/etc/stripe/yoyo/github.initialized', "yes\n")
           end
         end
 
@@ -355,6 +345,18 @@ EOM
           end
         end
 
+        step 'Wait for clone to finish' do
+          complete? do
+            mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/github.cloned}
+          end
+
+          run do
+            until mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/github.cloned}
+              sleep 30
+            end
+          end
+        end
+
         step 'Remove SSH key from github' do
           idempotent
 
@@ -364,7 +366,7 @@ EOM
           end
         end
 
-        step 'Run initialize-ssh on the target machine' do
+        step 'Initialize initialize-ssh on the target machine' do
           idempotent
 
           run do

@@ -86,6 +86,10 @@ fi
 wait_for_file ~/Desktop/certs.tar.gz.gpg
 run /usr/local/stripe/bin/import-vpn-keys ~/Desktop/certs.tar.gz.gpg
 
+wait_for_file /etc/stripe/yoyo/github.initialized
+run /Volumes/Marionette\ Cache/git/clone-all
+touch /etc/stripe/yoyo/github.cloned
+
 wait_for_file /etc/stripe/yoyo/vault_host_key.pub
 run /usr/local/stripe/bin/initialize-ssh
 
