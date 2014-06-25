@@ -157,9 +157,12 @@ EOM
             fingerprint = ""
             while fingerprint.length < 40
               begin
-                fingerprint += "%08x" % Sixword::Lib.decode_6_words($stdin.readline.split(' '), true)
+                line = $stdin.readline.split(' ')
+                piece = "%08x" % Sixword::Lib.decode_6_words(line, true)
+                piece = "0#{piece}" if piece.length % 2 == 1
+                fingerprint += piece
               rescue ArgumentError => e
-                log.error "That was not a valid sixwords line (#{e.to_s}). Retry!"
+                log.error "That was not a valid sixwords line (#{line} -- #{e.to_s}). Retry!"
               end
             end
             raise "Fingerprint doesn't look right" unless fingerprint.length == 40
