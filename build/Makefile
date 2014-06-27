@@ -1,6 +1,10 @@
 copy:
 	cd "Marionette Bootstrap" && xcodebuild
-	rsync -avp --delete "Marionette Bootstrap/build/Release/Marionette Bootstrap.app" "/Volumes/Marionette Cache"
+	for i in "/Volumes/Marionette Cache"*/"Marionette Bootstrap.app" ; do \
+		rsync -avp --delete "Marionette Bootstrap/build/Release/Marionette Bootstrap.app" "$$i"; \
+	done
 
 eject:
-	diskutil eject '/Volumes/Marionette Cache'
+	for i in "/Volumes/Marionette Cache"*/ ; do \
+		diskutil eject "$$i"; \
+	done
