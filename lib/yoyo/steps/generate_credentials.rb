@@ -111,7 +111,9 @@ module Yoyo;
           idempotent
 
           run do
-            mgr.ssh_root.file_write('/etc/stripe/yoyo/credentials.generate', 'yes')
+            mgr.ssh_root.file_write('/etc/stripe/facts/generate_keys.txt', 'yes')
+            mgr.ssh_root.file_write('/etc/stripe/facts/clone_github_repos.txt', 'yes')
+            mgr.ssh_root.file_write('/etc/stripe/yoyo/rerun_puppet', 'yes')
           end
         end
 

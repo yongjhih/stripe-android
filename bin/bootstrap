@@ -74,24 +74,15 @@ if ! [ -f ~/.ssh/authorized_keys ] ; then
     echo "Yoyo is now set up and running!"
 fi
 
-if ! [ -f ~/Desktop/certs.tar.gz.gpg ] ; then
-    cat <<EOF
-I'll now wait for the credentials sentinel file. If you won't generate
-credentials for this machine, you can press Ctrl+C now.
-EOF
-    wait_for_file /etc/stripe/yoyo/credentials.generate
-    run /usr/local/stripe/bin/generate-stripe-keys
-fi
-
-wait_for_file ~/Desktop/certs.tar.gz.gpg
-run /usr/local/stripe/bin/import-vpn-keys ~/Desktop/certs.tar.gz.gpg
+wait_for_file /etc/stripe/yoyo/rerun_puppet
 
 . ~/.profile
-wait_for_file /etc/stripe/yoyo/github.initialized
-run /Volumes/Marionette\ Cache/git/clone-all
-sudo touch /etc/stripe/yoyo/github.cloned
-
-wait_for_file /etc/stripe/yoyo/vault_host_key.pub
-run /usr/local/stripe/bin/initialize-ssh
+until stripe-marionette ; then
+    if [ $? = 2 ] ; then
+        echo "stripe-marionette finished - yay!"
+        break
+    fi
+    read -p "stripe-marionette exited with an error. Hit RET to retry: "
+fi
 
 echo "All done! Thanks for your patience!"
