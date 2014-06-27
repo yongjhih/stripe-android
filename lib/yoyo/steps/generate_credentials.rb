@@ -268,21 +268,21 @@ EOM
           end
         end
 
-        step 'read GPG-signed SSH key' do
+        step 'Wait for SSH key' do
+          idempotent?
+
+          run do
+            until mgr.ssh.if_call! %W{test -f ~/.ssh/id_rsa_#{stripe_email.to_s}.pub}
+              sleep 10
+            end
+          end
+        end
+
+        step 'Read SSH key' do
           idempotent
 
           run do
-            verifier = GPGVerifier.new()
-            verifier.read_ascii_armor_data
-            if stripe_email.to_s != verifier.signature_address.to_s
-              raise "The GPG data isn't signed by #{stripe_email.to_s}; " +
-                    "it's signed by #{verifier.signature_address.to_s}"
-            end
-            if fingerprint.upcase != verifier.signature_fpr.upcase
-              raise "The GPG data isn't signed by #{fingerprint.upcase}; " +
-                    "it's signed by #{verifier.signature_fpr.upcase}"
-            end
-            set_ssh_key(verifier.data.rstrip)
+            set_ssh_key(mgr.ssh.file_read("~/.ssh/id_rsa_#{stripe_email.to_s}.pub"))
           end
         end
 
