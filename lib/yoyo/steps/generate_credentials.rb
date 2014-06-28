@@ -269,7 +269,7 @@ EOM
         end
 
         step 'Wait for SSH key' do
-          idempotent?
+          idempotent
 
           run do
             until mgr.ssh.if_call! %W{test -f ~/.ssh/id_rsa_#{stripe_email.to_s}.pub}
