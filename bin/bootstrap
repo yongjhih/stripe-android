@@ -77,12 +77,12 @@ fi
 wait_for_file /etc/stripe/yoyo/rerun_puppet
 
 . ~/.profile
-until stripe-marionette ; then
+until stripe-marionette ; do
     if [ $? = 2 ] ; then
         echo "stripe-marionette finished - yay!"
         break
     fi
     read -p "stripe-marionette exited with an error. Hit RET to retry: "
-fi
+done
 
 echo "All done! Thanks for your patience!"
