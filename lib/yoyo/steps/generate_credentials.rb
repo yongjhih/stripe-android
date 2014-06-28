@@ -272,7 +272,7 @@ EOM
           idempotent
 
           run do
-            until mgr.ssh.if_call! %W{test -f ~/.ssh/id_rsa_#{stripe_email.to_s}.pub}
+            until mgr.ssh.if_call! %W{test -f ~/.ssh/id_rsa_#{stripe_email.address}.pub}
               sleep 10
             end
           end
@@ -282,7 +282,7 @@ EOM
           idempotent
 
           run do
-            set_ssh_key(mgr.ssh.file_read("~/.ssh/id_rsa_#{stripe_email.to_s}.pub"))
+            set_ssh_key(mgr.ssh.file_read("~/.ssh/id_rsa_#{stripe_email.address}.pub"))
           end
         end
 
