@@ -214,7 +214,7 @@ EOM
                   log.info "Should I re-generate certs for #{stripe_email.local}? [Y/n]"
                   case $stdin.readline.chomp.downcase
                   when 'yes', 'y', ''
-                    break false
+                    next false
                   end
                 end
                 true
