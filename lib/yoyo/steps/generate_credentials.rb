@@ -337,15 +337,15 @@ EOM
           end
         end
 
-        step 'Add the user to the dot-stripe2 key' do
+        step 'Add the user to the ro-secrets key for stripe' do
           complete? do
-            output = Subprocess.check_output(%w{fetch-password-recipients -r stripe/dot-stripe2-encfs},
+            output = Subprocess.check_output(%w{fetch-password-recipients -r space-commander/stripe/ro-secrets.yaml.gpg},
                                               :env => useful_env)
             output.chomp.split(/\s+/).find { |keyid| fingerprint_equivalent_to_key?(keyid) }
           end
 
           run do
-            Subprocess.check_call(%W{add-password-user -r #{gpg_long_keyid} stripe/dot-stripe2-encfs},
+            Subprocess.check_call(%W{add-password-user -r #{gpg_long_keyid} space-commander/stripe/ro-secrets.yaml.gpg},
                                   :env => useful_env)
           end
         end
