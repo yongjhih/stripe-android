@@ -209,14 +209,22 @@ EOM
                                                 '--secret-keyring', '/dev/null', '--list-only', '--list-packets',
                                                 '--verbose', latest_cert])
 
-              output.scan(/^:pubkey enc packet: .* keyid (.+)$/).flatten.find { |keyid| fingerprint_equivalent_to_key?(keyid) }
+              if output.scan(/^:pubkey enc packet: .* keyid (.+)$/).flatten.find { |keyid| fingerprint_equivalent_to_key?(keyid) }
+                if mgr.gpg_key
+                  log.info "Should I re-generate certs for #{stripe_email.local}? [Y/n]"
+                  case $stdin.readline.chomp.downcase
+                  when 'yes', 'y', ''
+                    return false
+                  end
+                end
+                true
+              end
             end
           end
 
           run do
             Bundler.with_clean_env do
               cmdline = %w{./stripe.vpn/add_certs.sh}
-              cmdline += %w{-a} if mgr.gpg_key # default to not revoking vpn certs for a second machine
               cmdline += %W{-k #{fingerprint}}
               cmdline += [stripe_email.local, stripe_email.name]
               Subprocess.check_call(cmdline, :cwd => dot_stripe, :env => useful_env)
