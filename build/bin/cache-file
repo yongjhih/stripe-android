@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -ex
+
+FILE="$1"; shift
+
+if [ -z "$FILE" ] || [ -z "$1" ] ; then
+    echo "USAGE: $0 file dest_vols ..." >&2
+    echo "This script stores a file as an S3 blob and updates the marionette caches in dest_vols."
+    exit 1
+fi
+
+cache_filename="$(~/stripe/marionette/bin/store-blob "$FILE")"
+
+for vol in "$@" ; do
+    destfile="$vol"/"$cache_filename"
+    mkdir -p "$(dirname "$destfile")"
+    if ! [ -f "$destfile" ] ; then
+        rsync -avp --progress "$FILE" "$destfile"
+    fi
+done
