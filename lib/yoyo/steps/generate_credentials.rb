@@ -107,12 +107,30 @@ module Yoyo;
       end
 
       def init_steps
-        step 'write sentinel file' do
-          idempotent
+        step 'write initial puppet facts for cert generation' do
+          complete? do
+            mgr.ssh_root.if_call!(%w{test -f /etc/stripe/yoyo/keys_generated})
+          end
 
           run do
             mgr.ssh_root.file_write('/etc/stripe/facts/generate_keys.txt', 'yes')
+          end
+        end
+
+        step 'write initial puppet facts for github cloning' do
+          complete? do
+            mgr.ssh_root.if_call!(%w{test -f /etc/stripe/yoyo/repos_cloned})
+          end
+
+          run do
             mgr.ssh_root.file_write('/etc/stripe/facts/clone_github_repos.txt', 'yes')
+          end
+        end
+
+        step 'write re-puppeting sentinel file' do
+          idempotent
+
+          run do
             mgr.ssh_root.file_write('/etc/stripe/yoyo/rerun_puppet', 'yes')
           end
         end
