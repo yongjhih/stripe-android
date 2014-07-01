@@ -1,7 +1,9 @@
 all: copy update_git update_cache
 
-copy:
+build:
 	cd "Marionette Bootstrap" && xcodebuild
+
+copy: build
 	for i in "/Volumes/Marionette Cache"*/"Marionette Bootstrap.app" ; do \
 		rsync -avp --delete "./Marionette Bootstrap/build/Release/Marionette Bootstrap.app/" "$$i"; \
 	done
