@@ -13,11 +13,24 @@ wait_for_file() {
     done
 }
 
+run_background_jobs() {
+    trap 'kill $sudo_pid $caffeinate_pid' EXIT
+    while echo "$user_password" | sudo -v -n -S ; do
+        sleep 60
+    done &
+    local sudo_pid=$!
+    caffeinate -ids &
+    local caffeinate_pid=$!
+}
+
 # we shouldn't be root when running this
 if [ "$(id -u)" -eq 0 ]; then
     echo "error: this script should not be run as root"
     exit 1
 fi
+
+read -p "Enter sudo password for $USER: " -s user_password
+run_background_jobs
 
 # install software updates (specifically so we get OS X 10.9.2+), but
 # only once:
