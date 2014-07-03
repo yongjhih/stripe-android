@@ -127,6 +127,23 @@ module Yoyo;
           end
         end
 
+        step 'write ssh-initing sentinel file' do
+          complete? do
+            mgr.ssh_root.if_call!(%w{test -f /etc/stripe/yoyo/ssh.initialized}) &&
+              !mgr.ssh_root.if_call!(%w{test -f /etc/stripe/facts/initialize_ssh.txt})
+          end
+
+          run do
+            vault_conn = SpaceCommander::SSH::Connection.new('root', 'vault.stripe.io')
+            host_key = vault_conn.file_read('/etc/ssh/ssh_host_rsa_key.pub')
+
+            vault_port = vault_conn.conn.options[:port]
+            vault_ip = vault_conn.conn.options[:host_name]
+            host_string = "[vault.stripe.io]:#{vault_port},[#{vault_ip}]:#{vault_port} "
+            mgr.ssh_root.file_write('/etc/stripe/facts/initialize_ssh.txt', host_string + host_key)
+          end
+        end
+
         step 'write re-puppeting sentinel file' do
           idempotent
 
@@ -388,26 +405,26 @@ EOM
           end
         end
 
+        step 'Initialize initialize-ssh on the target machine' do
+          complete? do
+            mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/ssh.initialized}
+          end
+
+          run do
+            log.info "Waiting until puppet of vault is finished - you did kick that off, yes?!"
+            until mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/ssh.initialized}
+              log.warn("vault.stripe.io might not know about #{mgr.username} yet - waiting some more. (Check that it's puppeted!)")
+              sleep 5
+            end
+          end
+        end
+
         step 'Remove SSH key from github' do
           idempotent
 
           run do
             the_key = github_client.keys.find { |key| key['key'] == ssh_key_bare }
             github_client.remove_key(the_key['id']) if the_key
-          end
-        end
-
-        step 'Initialize initialize-ssh on the target machine' do
-          idempotent
-
-          run do
-            vault_conn = SpaceCommander::SSH::Connection.new('root', 'vault.stripe.io')
-            host_key = vault_conn.file_read('/etc/ssh/ssh_host_rsa_key.pub')
-
-            vault_port = vault_conn.conn.options[:port]
-            vault_ip = vault_conn.conn.options[:host_name]
-            host_string = "[vault.stripe.io]:#{vault_port},[#{vault_ip}]:#{vault_port} "
-            mgr.ssh_root.file_write('/etc/stripe/yoyo/vault_host_key.pub', host_string + host_key)
           end
         end
       end
