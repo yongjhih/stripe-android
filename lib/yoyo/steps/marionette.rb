@@ -86,7 +86,7 @@ module Yoyo; module Steps
             log.info "Puppet run succeeded"
           else
             log.error "Puppet exited with status #{status}"
-            raise Error.new("Marionette puppet run faile")
+            raise Error.new("Marionette puppet run failed")
           end
 
           unless mgr.ssh_root.if_call! %w{test
