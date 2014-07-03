@@ -15,7 +15,7 @@ wait_for_file() {
 
 run_background_jobs() {
     trap 'kill $sudo_pid $caffeinate_pid' EXIT
-    while echo "$user_password" | sudo -v -S ; do
+    while echo "$user_password" | sudo -v -S -p '' ; do
         sleep 60
     done &
     local sudo_pid=$!
@@ -44,7 +44,7 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 read -p "Enter sudo password for $USER: " -s user_password
-echo "$user_password" | sudo -v -S
+echo "$user_password" | sudo -v -S -p ''
 run_background_jobs
 
 # install software updates (specifically so we get OS X 10.9.2+), but
