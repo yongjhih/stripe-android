@@ -51,7 +51,7 @@ OSStatus DoTerminalScript(const char *utf8Script) {
   // However,
   if([[NSWorkspace sharedWorkspace] launchApplication:@"Terminal"]) {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"bootstrap" ofType:nil];
-    path = [@"'" stringByAppendingString:[path stringByAppendingString:@"'"]];
+    path = [@"'" stringByAppendingString:[path stringByAppendingString:@"' && exit"]];
     NSLog(@"Running script %@", path);
     DoTerminalScript([path UTF8String]);
   }
