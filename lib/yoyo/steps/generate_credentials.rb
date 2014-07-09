@@ -427,6 +427,15 @@ EOM
             github_client.remove_key(the_key['id']) if the_key
           end
         end
+
+        step 'Register user with hackpad' do
+          idempotent
+
+          run do
+            hp_conn = SpaceCommander::SSH::Connection.new('root', 'hackpad1.northwest.stripe.io')
+            hp_conn.check_call! %W{./hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
+          end
+        end
       end
     end
   end
