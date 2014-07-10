@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
 
   spec.add_dependency 'docile', '~> 1.1'
-  spec.add_dependency 'sixword'
+  spec.add_dependency 'sixword', '~> 0.3'
   spec.add_dependency 'subprocess'
   spec.add_dependency 'space-commander'
   spec.add_dependency 'highline'

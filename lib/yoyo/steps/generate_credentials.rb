@@ -194,11 +194,9 @@ EOM
             fingerprint = ""
             while fingerprint.length < 40
               begin
-                line = $stdin.readline.split(' ')
-                piece = "%08x" % Sixword::Lib.decode_6_words(line, true)
-                piece = "0#{piece}" if piece.length % 2 == 1
-                fingerprint += piece
-              rescue ArgumentError => e
+                line = $stdin.readline
+                fingerprint += Sixword::Hex.encode(Sixword.pad_decode(line))
+              rescue Sixword::InputError => e
                 log.error "That was not a valid sixwords line (#{line} -- #{e.to_s}). Retry!"
               end
             end
