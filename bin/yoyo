@@ -24,6 +24,7 @@ class Spinup < Chalk::CLI::Command
     mgr = Yoyo::Manager.new(ip_address, username, args)
     mgr.deploy_authorized_keys! unless mgr.keys_deployed?
     mgr.spin_up!
+    mgr.disable_ssh!
   end
 
   App = Chalk::CLI::App.new('Usage: #{$0} spinup [OPTIONS] IP USERNAME')
