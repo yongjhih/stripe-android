@@ -109,7 +109,7 @@ module Yoyo
 
     def deploy_authorized_keys!
       log.info("Deploying #{local_ssh_pubkey} to target authorized_keys")
-      pubkey = File.read(local_ssh_pubkey)
+      pubkey = first_local_pubkey
 
       dir = File.join(target_home, '.ssh')
       ssh.check_call! %W{mkdir -vp #{dir}}
@@ -133,8 +133,8 @@ module Yoyo
       log.info("Done!")
     end
 
-    def local_ssh_pubkey
-      File.expand_path('~/.ssh/id_rsa.pub')
+    def first_local_pubkey
+      Subprocess.check_output(%w{ssh-add -L}).split("\n").first
     end
 
     private
