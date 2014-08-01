@@ -1,6 +1,6 @@
-require 'subprocess'
 require 'bundler/setup'
 
+require 'subprocess'
 require_relative 'yoyo/version'
 
 module Yoyo
