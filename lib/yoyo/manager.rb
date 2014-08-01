@@ -108,7 +108,7 @@ module Yoyo
     end
 
     def deploy_authorized_keys!
-      log.info("Deploying #{local_ssh_pubkey} to target authorized_keys")
+      log.info("Deploying local SSH pubkey to target authorized_keys")
       pubkey = first_local_pubkey
 
       dir = File.join(target_home, '.ssh')
