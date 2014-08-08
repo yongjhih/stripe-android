@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+"$REPO_DIR"/clone-repos "$REPO_DIR"/*.git

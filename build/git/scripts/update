@@ -1,0 +1,10 @@
+#!/bin/bash
+
+root=$(dirname "$0")
+
+for repo in "$root"/*.git; do
+  pushd "$repo" >/dev/null
+  echo "Updating $repo:"
+  git fetch
+  popd >/dev/null
+done

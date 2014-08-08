@@ -1,0 +1,60 @@
+#!/bin/sh -e
+
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+mkdir -p ~/stripe
+cd ~/stripe
+
+if [ -f ~/.rbenvrc ] ; then
+    . ~/.rbenvrc
+fi
+
+bundle_in() {
+    repo_name="$1"
+    failure_peaceful="$2"
+
+    if ! [ -f ~/stripe/"$repo_name"/Gemfile ] ; then
+        echo "$repo_name doesn't need bundling"
+        return 0
+    fi
+    pushd ~/stripe/"$repo_name"
+
+    case "$repo_name" in
+        pay-server)
+            # TODO: delurk this when either thrift upgrades / we get rid of thrift:
+            bundle config build.thrift --with-cppflags='-D_FORTIFY_SOURCE=0'
+            ;;
+    esac
+
+    if [ -z "$failure_peaceful" ] ; then
+        git pull
+        bundle install
+    else
+        git pull || true
+        bundle install || true
+    fi
+    popd
+}
+
+# Clone all the things:
+for repo in "$@" ; do
+    repo_name="$(basename "$repo" .git)"
+    "$REPO_DIR"/clone "$repo_name"
+done
+
+# Bundle all the things:
+
+echo "Now, add this user's ssh public key to the stripe-credentialing github user. I'll wait..."
+while ! ssh -T git@github.com 2>&1 | grep -l authenticated >/dev/null; do
+    sleep 1
+done
+
+if ! [ -L ~/.bundle-gemfile-hook ] && [ -d ~/stripe/henson ] ; then
+    bundle_in henson
+    yes | ~/stripe/henson/bin/henson --install
+fi
+
+for repo in "$@" ; do
+    repo_name="$(basename "$repo" .git)"
+    bundle_in "$repo_name" failure_is_peaceful
+done

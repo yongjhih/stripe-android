@@ -1,0 +1,27 @@
+#!/bin/bash
+
+root=$(dirname "$0")
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 repo-name"
+  echo "Valid repos:"
+  for repo in "$root"/*.git; do
+    repo=${repo##*/}
+    echo "- ${repo%.git}"
+  done
+  exit 1
+fi
+
+git clone "$root/${1}.git"
+cd "$1"
+git config remote.origin.url "git@github.com:stripe-internal/${1}.git"
+
+if [ "$1" == "space-commander" ]; then
+  git config commit.gpgsign true
+fi
+if [ "$1" == "password-vault" ]; then
+  git config commit.gpgsign true
+fi
+if [ "$1" == "henson" ]; then
+  git config commit.gpgsign true
+fi
