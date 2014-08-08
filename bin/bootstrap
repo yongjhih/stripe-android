@@ -88,11 +88,14 @@ for i in $(seq 0 "$(ipconfig ifcount)"); do
 done
 
 if ! [ -f ~/.ssh/authorized_keys ] ; then
+    echo ; echo ; echo
     echo "SSH key fingerprint:"
     ssh-keygen -lf /etc/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
+    echo ; echo ; echo
 
     echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine..."
     echo "(Waiting for you to run that command...)"
+    echo
     wait_for_file ~/.ssh/authorized_keys
 
     run sudo mkdir -vp ~root/.ssh
