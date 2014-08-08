@@ -218,7 +218,7 @@ EOM
             space_commander = File.expand_path("~/stripe/space-commander/bin")
             Bundler.with_clean_env do
               path = ENV['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
-              Subprocess.check_call(%W{bash -x ./gnupg/sign_gpg_key_with_ca.sh #{fingerprint}},
+              Subprocess.check_call(%W{bash ./gnupg/sign_gpg_key_with_ca.sh #{fingerprint}},
                                     :cwd => dot_stripe,
                                     :env => useful_env)
             end
