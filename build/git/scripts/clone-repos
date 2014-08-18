@@ -8,6 +8,7 @@ cd ~/stripe
 if [ -f ~/.rbenvrc ] ; then
     . ~/.rbenvrc
 fi
+unset RBENV_VERSION  # Always use the repo's version
 
 bundle_in() {
     repo_name="$1"
