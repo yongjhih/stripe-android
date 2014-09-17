@@ -378,19 +378,6 @@ EOM
           end
         end
 
-        step 'Add the user to the ro-secrets key for stripe' do
-          complete? do
-            output = Subprocess.check_output(%w{fetch-password-recipients -r space-commander/stripe/ro-secrets.yaml.gpg},
-                                              :env => useful_env)
-            output.chomp.split(/\s+/).find { |keyid| fingerprint_equivalent_to_key?(keyid) }
-          end
-
-          run do
-            Subprocess.check_call(%W{add-password-user -r #{gpg_long_keyid} space-commander/stripe/ro-secrets.yaml.gpg},
-                                  :env => useful_env)
-          end
-        end
-
         step 'Wait for clone to finish' do
           complete? do
             mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/github.cloned}
@@ -409,10 +396,10 @@ EOM
           end
 
           run do
-            log.info "Waiting until puppet of vault is finished - you did kick that off, yes?!"
+            log.info "Waiting until SSH is initialized..."
             until mgr.ssh.if_call! %w{test -f /etc/stripe/yoyo/ssh.initialized}
-              log.warn("vault.stripe.io might not know about #{mgr.username} yet - waiting some more. (Check that it's puppeted!)")
               sleep 5
+              log.info("Waiting a while longer for SSH to be initialized...")
             end
           end
         end
@@ -432,6 +419,18 @@ EOM
           run do
             hp_conn = SpaceCommander::SSH::Connection.new('root', 'hackpad1.northwest.stripe.io')
             hp_conn.check_call! %W{./hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
+          end
+        end
+
+        step 'Wait for puppet to be committed' do
+          idempotent
+
+          run do
+            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
+            until git_dir_clean?(puppet_dir)
+              log.warn("Puppet directory still has our uncommitted changes in it - please commit and push!")
+              sleep 10
+            end
           end
         end
       end
