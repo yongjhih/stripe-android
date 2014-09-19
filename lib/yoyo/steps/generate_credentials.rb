@@ -74,6 +74,7 @@ module Yoyo;
           env = ENV.to_hash
           path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
           env['PATH'] = path
+          env.delete('RBENV_VERSION')
           env
         end
       end
@@ -215,9 +216,7 @@ EOM
             raise "~/.stripe has uncommitted stuff in it! Clean it up, please!" unless dot_stripe_clean?
             Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe, :env => useful_env)
 
-            space_commander = File.expand_path("~/stripe/space-commander/bin")
             Bundler.with_clean_env do
-              path = ENV['PATH'].split(':').delete_if {|d| d.start_with?(File.expand_path('~/.rbenv/versions'))}.join(':')
               Subprocess.check_call(%W{bash ./gnupg/sign_gpg_key_with_ca.sh #{fingerprint}},
                                     :cwd => dot_stripe,
                                     :env => useful_env)
