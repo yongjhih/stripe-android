@@ -56,7 +56,10 @@ module Yoyo
     end
 
     def ssh_root
-      @ssh_root ||= ssh!('root', :keys_only => true, :auth_methods => %w{publickey})
+      @ssh_root ||= ssh!('root', :keys_only => true, :auth_methods => %w{publickey},
+        # :verbose => Logger::DEBUG,  # Useful when debugging (:
+        :keys => [first_local_privkey],
+        )
     end
 
     def ssh_known_hosts_file
@@ -103,7 +106,8 @@ module Yoyo
     def keys_deployed?
       ssh_root.check_call!(%w{true})
       true
-    rescue Net::SSH::AuthenticationFailed
+    rescue Net::SSH::AuthenticationFailed => e
+      log.debug("Couldn't authenticate: " + e.to_s)
       false
     end
 
@@ -135,6 +139,10 @@ module Yoyo
 
     def first_local_pubkey
       Subprocess.check_output(%w{ssh-add -L}).split("\n").first
+    end
+
+    def first_local_privkey
+      first_local_pubkey.split(/\s/, 3)[2]
     end
 
     private
