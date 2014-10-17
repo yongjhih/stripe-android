@@ -30,13 +30,13 @@ class Spinup < Chalk::CLI::Command
   App = Chalk::CLI::App.new('Usage: #{$0} spinup [OPTIONS] IP USERNAME')
   App.options do |opts|
     opts.opt :no_certs, "Skip the certificate-generation step (for spinning up contractor machines)",
-             :short => 'n', :default => false
+             :default => false
     opts.opt :groups, "Add the user to these permission groups in puppet (separated by commas)",
-             :short => 'g', :type => :string, :default => "devbox"
+             :type => :string, :default => "devbox"
     opts.opt :gpg_key, "Assume this GPG fingerprint is the existing key",
-             :type => :string, :short => 'c', :default => nil
+             :type => :string, :default => nil
     opts.opt :stripe_user, 'Stripe username, if different from local username',
-             :short => 's', :type => :string, :default => nil
+             :type => :string, :default => nil
   end
   App.action(self)
 end
