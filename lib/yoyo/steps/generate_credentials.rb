@@ -206,6 +206,14 @@ EOM
           end
         end
 
+        step 'update ~/.stripe' do
+          idempotent
+
+          run do
+            Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe, :env => useful_env)
+          end
+        end
+
         step 'gpg-sign their key' do
           complete? do
             mgr.gpg_key ||
@@ -214,8 +222,6 @@ EOM
 
           run do
             raise "~/.stripe has uncommitted stuff in it! Clean it up, please!" unless dot_stripe_clean?
-            Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe, :env => useful_env)
-
             Bundler.with_clean_env do
               Subprocess.check_call(%W{bash ./gnupg/sign_gpg_key_with_ca.sh #{fingerprint}},
                                     :cwd => dot_stripe,
@@ -255,6 +261,12 @@ EOM
           end
 
           run do
+            if mgr.gpg_key
+              # We haven't checked whether there is any uncommitted
+              # stuff in ~/.stripe yet, so do it again.
+              raise "~/.stripe has uncommitted stuff in it! Clean it up, please!" unless dot_stripe_clean?
+            end
+
             Bundler.with_clean_env do
               cmdline = %w{./stripe.vpn/add_certs.sh}
               cmdline += %W{-k #{fingerprint}}
