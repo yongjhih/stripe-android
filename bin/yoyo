@@ -18,7 +18,8 @@ class Spinup < Chalk::CLI::Command
       :no_certs => options[:no_certs],
       :groups => groups,
       :gpg_key => options[:gpg_key],
-      :stripe_user => options[:stripe_user]
+      :stripe_user => options[:stripe_user],
+      :machine_nubmer => options[:machine],
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
@@ -37,6 +38,8 @@ class Spinup < Chalk::CLI::Command
              :type => :string, :default => nil
     opts.opt :stripe_user, 'Stripe username, if different from local username',
              :type => :string, :default => nil
+    opts.opt :machine, 'Stripe machine number (this goes on "st-userNN")',
+             :type => :integer, :default => nil
   end
   App.action(self)
 end

@@ -22,6 +22,11 @@ module Yoyo; module Steps
                                     mgr.gpg_key + "\n")
           end
           mgr.ssh_root.check_call! %w{mkdir -p /etc/stripe/yoyo}
+
+          if mgr.machine_number
+            mgr.ssh_root.file_write('/etc/stripe/facts/machinenumber.txt',
+                                    mgr.machine_number + "\n")
+          end
         end
       end
 
