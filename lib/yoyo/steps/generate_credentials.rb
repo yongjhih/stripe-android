@@ -294,7 +294,9 @@ EOM
           idempotent
 
           run do
-            Subprocess.check_call(%w{bin/dot-git push}, :cwd => dot_stripe)
+            Bundler.with_clean_env do
+              Subprocess.check_call(%w{bin/dot-git push}, :cwd => dot_stripe, :env => useful_env)
+            end
           end
         end
 
