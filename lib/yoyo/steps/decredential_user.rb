@@ -38,7 +38,7 @@ module Yoyo
             complete? do
               begin
                 users = Subprocess.check_output(%W{sc-iam list-users #{domain}}, :env => useful_env).split("\n")
-                users.include?(mgr.username)
+                !users.include?(mgr.username)
               rescue Subprocess::NonZeroExit
                 # Don't break now, but warn profusely:
                 log.error "Could not check if #{domain} has keys for #{mgr.username}. Do you have creds?"
