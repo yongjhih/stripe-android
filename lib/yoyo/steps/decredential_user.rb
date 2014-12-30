@@ -42,7 +42,7 @@ module Yoyo
               rescue Subprocess::NonZeroExit
                 # Don't break now, but warn profusely:
                 log.error "Could not check if #{domain} has keys for #{mgr.username}. Do you have creds?"
-                log.warning "Blazing ahead anyway..."
+                log.warn "Blazing ahead anyway..."
                 true
               end
             end
