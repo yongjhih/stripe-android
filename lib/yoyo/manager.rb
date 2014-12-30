@@ -21,22 +21,31 @@ module Yoyo
       @log ||= SpaceCommander::StripeLogger.new('yoyo')
     end
 
-    def spin_up!
-      log.info("Starting spin_up!")
-
-      step_classes = [
-        Yoyo::Steps::Marionette,
-      ]
-      step_classes << Yoyo::Steps::GenerateCredentials unless @skip_certs
-
-
+    def run_steps(step_classes)
       step_classes.each do |klass|
+        next if klass.nil?
+
         log.info('Beginning step list: ' + klass.name)
         steplist = klass.new(self)
         steplist.run!
       end
+    end
 
+    def spin_up!
+      log.info("Starting spin_up!")
+
+      run_steps([
+                  Yoyo::Steps::Marionette,
+                  (@skip_certs ? nil : Yoyo::Steps::GenerateCredentials)
+                ])
       log.info("Finished spin_up!")
+    end
+
+    def decredential_user!
+      log.info("Starting decredential_user!")
+      run_steps([
+                  Yoyo::Steps::DecredentialUser
+                ])
     end
 
     def target_serial

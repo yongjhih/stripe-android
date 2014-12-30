@@ -55,6 +55,17 @@ class Cleanup < Chalk::CLI::Command
   App.action(self)
 end
 
+class Decredential < Chalk::CLI::Command
+  def invoke
+    command_name, username = arguments
+    mgr = Yoyo::Manager.new(nil, username)
+    mgr.decredential_user!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} decredential USERNAME')
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -64,6 +75,8 @@ Commands:
     spinup [options] IP_ADDRESS USERNAME
 
     cleanup IP_ADDRESS USERNAME
+
+    decredential USERNAME
 
     EOM
   return 1
@@ -75,6 +88,8 @@ def parse_args(args)
     Spinup::App.run_if_invoked(__FILE__)
   when 'cleanup'
     Cleanup::App.run_if_invoked(__FILE__)
+  when 'decredential'
+    Decredential::App.run_if_invoked(__FILE__)
   else
     return usage
   end
