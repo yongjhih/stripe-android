@@ -65,14 +65,15 @@ module Yoyo
         step 'revoke VPN certificates for a full-time stripe' do
           complete? do
             # This user is not known as a fulltime person:
-            return true if (user = vpnmaker.tracker.users[mgr.username]).nil?
+            next true if (user = vpnmaker.tracker.users[mgr.username]).nil?
 
-            version = vpnmaker.tracker.active_key_version
-            while version >= 0
-              return false unless vpnmaker.tracker.revoked?(mgr.username, version)
+            version = vpnmaker.tracker.active_key_version(mgr.username)
+            found = false
+            while version >= 0 && !found
+              next (found = true) unless vpnmaker.tracker.revoked?(mgr.username, version)
               version -= 1
             end
-            true
+            !found
           end
 
           run do
