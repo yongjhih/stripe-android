@@ -38,7 +38,7 @@ PATH
       subprocess
 
 GEM
-  remote: https://intgems.stripe.com:446/
+  remote: https://intgems.local.corp.stripe.com:446/
   specs:
     addressable (2.3.5)
     aws-sdk (1.48.1)
