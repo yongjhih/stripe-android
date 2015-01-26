@@ -96,6 +96,19 @@ module Yoyo
         end
 
         commit_and_push_dot_stripe_steps { "Decredential #{mgr.username}" }
+
+        step 'Update VPN and intfe CRLs' do
+          idempotent
+
+          run do
+            Subprocess.check_call(%w{bin/upload-stripe-vpn}, :cwd => dot_stripe, :env => useful_env)
+            %w{mainland qa}.each do |island|
+              Subprocess.check_call(%W{sc-puppet-secrets #{island} },
+                                    :env => useful_env)
+            end
+            Subprocess.check_call(%w{for-servers -Sat vpn -t intfe stripe-puppet}, env => useful_env)
+          end
+        end
       end
     end
   end
