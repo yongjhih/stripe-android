@@ -17,7 +17,7 @@ update_git: init_usbdrive
 update_cache: init_usbdrive
 	(cd cache && \
 	for file in * ; do \
-		../bin/cache-file "$$file" "/Volumes/Marionette Cache"* ; \
+		../bin/cache-file "$$file" "/Volumes/Marionette Cache"*/ ; \
 	done)
 
 init_usbdrive:
