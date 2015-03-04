@@ -1,6 +1,6 @@
 module Yoyo; module Steps
   class Marionette < Yoyo::StepList
-    def marionette_dns; 'marionette.stripe.com'; end
+    def marionette_dns; 'marionette.corp.stripe.com'; end
     def marionette_ssh; 'marionette1.stripe.io'; end
 
     def init_steps

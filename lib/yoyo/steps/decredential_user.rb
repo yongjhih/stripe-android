@@ -6,7 +6,7 @@ module Yoyo
   module Steps
     # Steps to disable the most critical of a user's accesses. This is
     # not complete, see
-    # https://hackpad.stripe.com/Decredentialing-Checklist-Template-QbLT18NFYkP
+    # https://hackpad.corp.stripe.com/Decredentialing-Checklist-Template-QbLT18NFYkP
     # for the actual steps to perform. However, it is intended to be
     # useful to clear the list of critical things as quickly as
     # possible.
