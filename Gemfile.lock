@@ -1,18 +1,18 @@
 GIT
   remote: git@github.com:stripe-internal/space-commander
-  revision: 5a02cf43f4751542276137ec0666af5c2578a5ab
-  ref: 5a02cf43f4751542276137ec0666af5c2578a5ab
+  revision: 39d854ce3dba3c9ee251e2c63b627515fdc0f977
+  ref: 39d854ce3dba3c9ee251e2c63b627515fdc0f977
   specs:
-    space-commander (1.1.0)
+    space-commander (1.2.0)
       aws-sdk (~> 1.38)
       chalk-hostname
-      chalk-tools
+      chalk-tools (>= 0.0.31, < 1.0)
       domainatrix
       multi_json
       net-sftp
-      net-ssh (~> 2.6.7)
+      net-ssh (~> 2.9.2)
       net-ssh-gateway
-      octokit (~> 1.24)
+      octokit (~> 3.7)
       rest-client
       rqrcode
       thor
@@ -40,78 +40,76 @@ PATH
 GEM
   remote: https://intgems.local.corp.stripe.com:446/
   specs:
-    addressable (2.3.5)
-    aws-sdk (1.48.1)
+    addressable (2.3.6)
+    aws-sdk (1.61.0)
+      aws-sdk-v1 (= 1.61.0)
+    aws-sdk-v1 (1.61.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
-    chalk-cli (0.0.2)
+    chalk-cli (0.0.4)
+      chalk-config (~> 0.2.0)
       chalk-log
       trollop
-    chalk-log (0.0.12)
+    chalk-config (0.2.1)
+      configatron (~> 4.4)
+    chalk-log (0.1.2)
+      chalk-config
       logging
-    chalk-tools (0.0.25)
+      lspace
+    chalk-tools (0.0.34)
       chalk-log
       json
       lspace (~> 0.9)
       rack
       subprocess
-    coderay (1.0.9)
-    docile (1.1.1)
+    coderay (1.1.0)
+    configatron (4.5.0)
+    docile (1.1.5)
     domainatrix (0.0.11)
       addressable
-    faraday (0.8.8)
-      multipart-post (~> 1.2.0)
-    faraday_middleware (0.9.0)
-      faraday (>= 0.7.4, < 0.9)
-    hashie (2.0.5)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
     highline (1.6.20)
-    json (1.8.1)
+    json (1.8.2)
     little-plugger (1.1.3)
-    logging (1.8.1)
+    logging (1.8.2)
       little-plugger (>= 1.1.3)
-      multi_json (>= 1.3.6)
+      multi_json (>= 1.8.4)
     lspace (0.13)
-    mail (2.5.4)
-      mime-types (~> 1.16)
-      treetop (~> 1.4.8)
+    mail (2.6.3)
+      mime-types (>= 1.16, < 3)
     method_source (0.8.2)
-    mime-types (1.25)
-    mini_portile (0.6.0)
-    multi_json (1.8.2)
-    multipart-post (1.2.0)
+    mime-types (2.4.3)
+    mini_portile (0.6.2)
+    multi_json (1.10.1)
+    multipart-post (2.0.0)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
-    net-ssh (2.6.8)
+    net-ssh (2.9.2)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
-    netrc (0.7.7)
-    nokogiri (1.6.3.1)
-      mini_portile (= 0.6.0)
-    octokit (1.24.0)
-      addressable (~> 2.2)
-      faraday (~> 0.8)
-      faraday_middleware (~> 0.9)
-      hashie (~> 2.0)
-      multi_json (~> 1.3)
-      netrc (~> 0.7.7)
-    polyglot (0.3.3)
-    pry (0.9.12.2)
-      coderay (~> 1.0.5)
-      method_source (~> 0.8)
+    netrc (0.10.3)
+    nokogiri (1.6.5)
+      mini_portile (~> 0.6.0)
+    octokit (3.7.0)
+      sawyer (~> 0.6.0, >= 0.5.3)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (1.5.2)
-    rake (10.1.0)
+    rack (1.6.0)
+    rake (10.4.2)
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     rqrcode (0.4.2)
+    sawyer (0.6.0)
+      addressable (~> 2.3.5)
+      faraday (~> 0.8, < 0.10)
     sixword (0.3.0)
-    slop (3.4.7)
+    slop (3.6.0)
     subprocess (1.2.0)
     thor (0.19.1)
-    treetop (1.4.15)
-      polyglot
-      polyglot (>= 0.3.1)
     trollop (2.0)
 
 PLATFORMS
