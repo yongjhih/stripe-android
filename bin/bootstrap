@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eu
+set -o pipefail
 
 run() {
     echo >&2 "+ $*"
@@ -11,6 +12,16 @@ wait_for_file() {
     while ! [ -f "$1" ] ; do
         sleep 1
     done
+}
+
+default_password_set() {
+    default_password='falafels'
+    sudo -k
+    if dscl . -passwd /Users/$USER "$default_password" "$default_password" >/dev/null 2>/dev/null ; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 run_background_jobs() {
@@ -37,15 +48,24 @@ generate_input_plist() {
 EOF
 }
 
+# Set at imaging time, must be reset before we actually get anywhere
+# that places certs on this machine:
+default_password='falafels'
+
 # we shouldn't be root when running this
 if [ "$(id -u)" -eq 0 ]; then
     echo "error: this script should not be run as root"
     exit 1
 fi
 
-read -p "Enter sudo password for $USER: " -s user_password
-echo "$user_password" | sudo -v -S -p ''
-run_background_jobs
+user_password="$default_password"
+if ! default_password_set ; then
+    read -p "Enter sudo password for $USER: " -s user_password
+    echo "$user_password" | sudo -k -v -S -p ''
+    run_background_jobs
+else
+    echo "$user_password" | sudo -v -S -p ''
+fi
 
 # install software updates (specifically so we get OS X 10.9.2+), but
 # only once:
@@ -61,6 +81,16 @@ if ! run fdesetup isactive; then
 fi
 
 trap 'echo ERROR' EXIT
+
+# Reset any default passwords from imaging:
+if default_password_set ; then
+    echo "Default password detected, we must reset it now!"
+    read -p "Enter new password for $USER: " -s user_password
+    dscl . -passwd /Users/$USER "$default_password" "$user_password"
+    sudo -k
+    echo "$user_password" | sudo -v -S -p ''
+    run_background_jobs
+fi
 
 # enable SSH
 run sudo systemsetup -setremotelogin on
