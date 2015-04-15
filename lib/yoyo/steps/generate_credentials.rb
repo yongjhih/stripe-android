@@ -67,7 +67,7 @@ module Yoyo;
         @client ||=
           begin
             secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
-            Octokit::Client.new(:oauth_token => secret['auth_token'])
+            Octokit::Client.new(:access_token => secret['auth_token'])
           end
       end
 
