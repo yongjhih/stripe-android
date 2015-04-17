@@ -56,7 +56,7 @@ GEM
       chalk-config
       logging
       lspace
-    chalk-tools (0.0.34)
+    chalk-tools (0.0.31)
       chalk-log
       json
       lspace (~> 0.9)
