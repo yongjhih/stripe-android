@@ -88,7 +88,7 @@ module Yoyo
 
           run do
             unrevoked_contractor_serials(mgr.username).each do |serial|
-              Subprocess.check_call(%W{bash -c '. vars && ./scripts/revoke data/#{serial}.pem'},
+              Subprocess.check_call(%W{bash -c} + [". vars && ./scripts/revoke data/#{serial}.pem"],
                                     :cwd => File.join(dot_stripe, 'ca'),
                                     :env => useful_env)
             end
