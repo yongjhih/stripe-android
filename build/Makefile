@@ -1,7 +1,7 @@
 PKG_VERSION = 0.2.1
 FLATPKG_IDENTITY = Y28TH9SHX7
 
-all: package copy update_git update_cache
+all: package update_git update_cache
 
 build:
 	cd "Marionette Bootstrap" && xcodebuild
@@ -14,12 +14,6 @@ package: build
 	cp "Marionette Bootstrap/com.stripe.it.mac.yoyo-bootstrap.plist" "Marionette Bootstrap/build/pkgroot/Library/LaunchAgents"
 	pkgbuild --identifier com.stripe.it.mac.yoyo.bootstrap --version ${PKG_VERSION} --root "Marionette Bootstrap"/build/pkgroot --component-plist "Marionette Bootstrap"/component.plist "Marionette Bootstrap/build/bootstrap.component-${PKG_VERSION}.pkg"
 	productbuild --package "Marionette Bootstrap/build/bootstrap.component-${PKG_VERSION}.pkg" --sign ${FLATPKG_IDENTITY} "Marionette Bootstrap/build/Marionette Bootstrap-${PKG_VERSION}.pkg"
-
-
-copy: build init_usbdrive
-	for i in "/Volumes/Marionette Cache"*/"Marionette Bootstrap.app" ; do \
-		rsync -avp --delete "./Marionette Bootstrap/build/Release/Marionette Bootstrap.app/" "$$i"; \
-	done
 
 update_git: init_usbdrive
 	for i in "/Volumes/Marionette Cache"*/"git" ; do \
@@ -35,7 +29,12 @@ update_cache: init_usbdrive
 
 init_usbdrive:
 	for target in "/Volumes/Marionette Cache"*/ ; do \
-		mkdir -p "$$target"/{git,"Marionette Bootstrap.app",stripe-marionette} ; \
+		if [ -d "$$target" ] ; then \
+			mkdir -p "$$target"/{git,"Marionette Bootstrap.app",stripe-marionette} ; \
+		else \
+			echo "There doesn't seem to be a yoyo cache usb drive plugged in." ; \
+			exit 1; \
+		fi ; \
 	done
 
 eject:
