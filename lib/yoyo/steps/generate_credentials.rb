@@ -296,8 +296,10 @@ EOM
 
           run do
             users = puppet_users_list
+            max_uid = users.fetch('auth::users').map{|_,v| v.fetch(:uid, 9999)}.max
             users.fetch('auth::users')[stripe_email.local] = {
               name: stripe_email.name,
+              uid: max_uid + 1,
               pubkeys: [],
               privileges: mgr.puppet_groups
             }
