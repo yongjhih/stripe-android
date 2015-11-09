@@ -4,7 +4,7 @@ require_relative '../lib/yoyo'
 require 'chalk-cli'
 
 class Spinup < Chalk::CLI::Command
-  NECESSARY_GROUPS=%w{password-vault}
+  NECESSARY_GROUPS=%w{stripe}
 
   def invoke
     if arguments.length != 3
