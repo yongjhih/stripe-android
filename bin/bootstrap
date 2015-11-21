@@ -128,7 +128,7 @@ done
 if ! [ -f ~/.ssh/authorized_keys ] ; then
     echo ; echo ; echo
     echo "SSH key fingerprint:"
-    ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub | cut -d' ' -f2 | sixword -H
+    ssh-keygen -E "md5" -l -f /etc/ssh/ssh_host_rsa_key.pub | cut -d' ' -f2 | sed 's/MD5://' | sixword -H
     echo ; echo ; echo
 
     echo "Please run \`yoyo spinup $suggested_ip $USER\` on the credentialer machine..."
