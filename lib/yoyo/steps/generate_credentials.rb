@@ -105,13 +105,7 @@ module Yoyo;
           end
 
           run do
-            vault_conn = SpaceCommander::SSH::Connection.new('root', 'vault.stripe.io')
-            host_key = vault_conn.file_read('/etc/ssh/ssh_host_rsa_key.pub')
-
-            vault_port = vault_conn.conn.options[:port]
-            vault_ip = vault_conn.conn.options[:host_name]
-            host_string = "[vault.stripe.io]:#{vault_port},[#{vault_ip}]:#{vault_port} "
-            mgr.ssh_root.file_write('/etc/stripe/facts/initialize_ssh.txt', host_string + host_key)
+            mgr.ssh_root.file_write('/etc/stripe/facts/initialize_ssh.txt', "done")
           end
         end
 
