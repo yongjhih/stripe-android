@@ -423,7 +423,7 @@ EOM
           idempotent
 
           run do
-            hp_conn = SpaceCommander::SSH::Connection.new('root', 'hackpad1.northwest.stripe.io')
+            hp_conn = SpaceCommander::SSH::Connection.new('root', 'hackpad2.northwest.stripe.io')
             hp_conn.check_call! %W{./hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
           end
         end
