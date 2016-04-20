@@ -1,4 +1,4 @@
-require File.expand_path("~/stripe/vpnmaker/vpnmaker")
+require File.expand_path("~/.stripe/stripe.vpn/vpnmaker/vpnmaker")
 require 'csv'
 require 'openssl'
 
