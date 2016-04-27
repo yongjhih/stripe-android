@@ -55,7 +55,7 @@ module Yoyo; module Steps
             %W{puppet agent --test --fingerprint --digest sha256
                --certname #{mgr.target_certname}}).split.last
           server_cert = Subprocess.check_output(%W{
-            ssh root@#{step_list.marionette_ssh} marionette-cert list
+            ssh #{step_list.marionette_ssh} sudo marionette-cert list
                 --digest sha256 #{mgr.target_certname}})
             .split.last.delete('()')
 
@@ -69,7 +69,7 @@ module Yoyo; module Steps
           log.info("Puppet cert #{agent_cert} matches")
 
           Subprocess.check_output(%W{
-            ssh root@#{step_list.marionette_ssh} marionette-cert sign
+            ssh #{step_list.marionette_ssh} sudo marionette-cert sign
                 #{mgr.target_certname}})
 
           mgr.ssh_root.check_call! %w{touch /etc/stripe/yoyo/marionette-auth}
