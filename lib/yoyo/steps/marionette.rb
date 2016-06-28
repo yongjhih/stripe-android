@@ -37,7 +37,7 @@ module Yoyo; module Steps
 
         run do
           mgr.ssh_root.check_call! %w{gem update --system}
-          mgr.ssh_root.check_call! %w{gem install --no-ri --no-rdoc puppet -v ~>3.7.5}
+          mgr.ssh_root.check_call! %w{gem install --no-ri --no-rdoc --bindir=/usr/local/bin puppet -v ~>3.7.5}
         end
       end
 
@@ -48,11 +48,11 @@ module Yoyo; module Steps
 
         run do
           mgr.ssh_root.call! %W{
-            puppet agent --mkusers --test --server #{step_list.marionette_dns}
+            /usr/local/bin/puppet agent --mkusers --test --server #{step_list.marionette_dns}
             --certname #{mgr.target_certname}}
 
           agent_cert = mgr.ssh_root.check_output!(
-            %W{puppet agent --test --fingerprint --digest sha256
+            %W{/usr/local/bin/puppet agent --test --fingerprint --digest sha256
                --certname #{mgr.target_certname}}).split.last
           server_cert = Subprocess.check_output(%W{
             ssh #{step_list.marionette_ssh} sudo marionette-cert list
@@ -84,7 +84,7 @@ module Yoyo; module Steps
         run do
           out, err, status = mgr.ssh_root.exec!("cd /;" +
             " unset TMPDIR;" +
-            " puppet agent --test --server '#{step_list.marionette_dns}'" +
+            " /usr/local/bin/puppet agent --test --server '#{step_list.marionette_dns}'" +
             " --certname '#{mgr.target_certname}'")
 
           if status == 0 || status == 2
