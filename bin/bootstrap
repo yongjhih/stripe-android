@@ -83,9 +83,11 @@ if [ $fvstatus = 0 ]; then
     while [ $fdedeferstatus = "0" ]; do
         fdedeferstatus=$(sudo fdesetup showdeferralinfo | grep -c "Defer = 1")
         echo "Waiting for Casper to enable Filevault"
+        sleep 5
     done
 
     echo "Filevault is enabled but requires user to logout. Wait for logout and enter user's password."
+    sleep 5 
     #make user logout
     osascript -e 'tell application "loginwindow" to  «event aevtrlgo»'
 fi
