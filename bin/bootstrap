@@ -74,7 +74,7 @@ if ! sudo softwareupdate --schedule | grep '^Automatic check is off'; then
     run sudo softwareupdate --schedule on
 fi
 
-# check if filevault is enabled. If not, wait for Casper to enabled it via MDM
+# check if filevault is enabled. If not, wait for Casper to enable it.
 fvstatus=$(fdesetup status | grep -c "FileVault is On")
 
 if [ $fvstatus = 0 ]; then
