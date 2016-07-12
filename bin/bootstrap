@@ -92,6 +92,7 @@ if [ $fvstatus = 0 ]; then
     osascript -e 'tell application "loginwindow" to  «event aevtrlgo»'
 fi
 
+trap 'echo ERROR' EXIT
 
 # Reset any default passwords from imaging:
 if default_password_set ; then
