@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "D83C38C6B9BDB887EB7A857A7FFD88784F188084",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "C0381821-4E29-4B76-AF7B-1043D083544B" : 0,
+    "D83C38C6B9BDB887EB7A857A7FFD88784F188084" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "0BCD82C1-0FB7-4D8F-86A4-E040714B6A52",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "C0381821-4E29-4B76-AF7B-1043D083544B" : "Marionette Bootstrap",
+    "D83C38C6B9BDB887EB7A857A7FFD88784F188084" : "yoyo"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Marionette Bootstrap",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "build\/Marionette Bootstrap\/Marionette Bootstrap.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "ssh:\/\/github.com\/stripe-internal\/yoyo.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C0381821-4E29-4B76-AF7B-1043D083544B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:stripe-internal\/yoyo.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D83C38C6B9BDB887EB7A857A7FFD88784F188084"
+    }
+  ]
+}
