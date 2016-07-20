@@ -1,4 +1,4 @@
-PKG_VERSION = 0.2.1
+PKG_VERSION = 0.2.3
 FLATPKG_IDENTITY = Y28TH9SHX7
 
 all: package update_git update_cache
