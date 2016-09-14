@@ -2,6 +2,9 @@
 set -eu
 set -o pipefail
 
+# invitation for enrolling to jss
+enrollment_invite='318026568035627000628803707608018703959'
+
 run() {
     echo >&2 "+ $*"
     "$@"
@@ -12,6 +15,11 @@ wait_for_file() {
     while ! [ -f "$1" ] ; do
         sleep 1
     done
+}
+
+wait_for_network() {
+    echo "Waiting for network to come up..."
+    ping -o 8.8.8.8
 }
 
 default_password_set() {
@@ -58,6 +66,8 @@ if [ "$(id -u)" -eq 0 ]; then
     exit 1
 fi
 
+wait_for_network
+
 user_password="$default_password"
 if ! default_password_set ; then
     read -p "Enter sudo password for $USER: " -s user_password
@@ -65,6 +75,16 @@ if ! default_password_set ; then
     run_background_jobs
 else
     echo "$user_password" | sudo -v -S -p ''
+fi
+
+# force renrollment with the jss since it doesn't always work the first time
+# hopefully someday we don't need to do this :(
+jssenroll="/etc/stripe/facts/jssenroll.txt"
+
+if [ ! -f $jssenroll ]; then
+  echo "Re-enrolling to the jss..."
+  sudo /usr/local/bin/jamf enroll -invitation "$enrollment_invite"
+  sudo touch $jssenroll
 fi
 
 # install software updates (specifically so we get OS X 10.10.3+), but
@@ -87,7 +107,7 @@ if [ $fvstatus = 0 ]; then
     done
 
     echo "Filevault is enabled but requires user to logout. Wait for logout and enter user's password."
-    sleep 5 
+    sleep 5
     #make user logout
     osascript -e 'tell application "loginwindow" to  «event aevtrlgo»'
 fi
