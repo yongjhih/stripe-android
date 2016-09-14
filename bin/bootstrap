@@ -87,13 +87,6 @@ if [ ! -f $jssenroll ]; then
   sudo touch $jssenroll
 fi
 
-# install software updates (specifically so we get OS X 10.10.3+), but
-# only once:
-if ! sudo softwareupdate --schedule | grep '^Automatic check is off'; then
-    run sudo softwareupdate --install --all
-    run sudo softwareupdate --schedule on
-fi
-
 # check if filevault is enabled. If not, wait for Casper to enable it.
 fvstatus=$(fdesetup status | grep -c "FileVault is On")
 
@@ -109,7 +102,7 @@ if [ $fvstatus = 0 ]; then
     echo "Filevault is enabled but requires user to logout. Wait for logout and enter user's password."
     sleep 5
     #make user logout
-    osascript -e 'tell application "loginwindow" to  «event aevtrlgo»'
+    osascript -e 'tell application "System Events"' -e 'log out' -e 'keystroke return' -e end
 fi
 
 trap 'echo ERROR' EXIT
