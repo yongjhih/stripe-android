@@ -115,6 +115,13 @@ fi
 # enable SSH
 run sudo systemsetup -setremotelogin on
 
+# allow this user to be sshed-to
+run sudo dseditgroup -o edit -n /Local/Default -a $USER -t user com.apple.access_ssh
+
+# restart ssh
+run sudo launchctl unload /System/Library/LaunchDaemons/ssh.plist
+run sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+
 # SSH key doesn't exist until we hit the SSH server for the first time
 echo hello | run nc -z localhost 22
 
