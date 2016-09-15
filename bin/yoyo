@@ -33,7 +33,7 @@ class Spinup < Chalk::CLI::Command
     opts.opt :no_certs, "Skip the certificate-generation step (for spinning up contractor machines)",
              :default => false
     opts.opt :groups, "Add the user to these permission groups in puppet (separated by commas)",
-             :type => :string, :default => "devbox"
+             :type => :string, :default => nil
     opts.opt :gpg_key, "Assume this GPG fingerprint is the existing key",
              :type => :string, :default => nil
     opts.opt :stripe_user, 'Stripe username, if different from local username',

@@ -77,9 +77,20 @@ else
     echo "$user_password" | sudo -v -S -p ''
 fi
 
+# hack the planet
 # force renrollment with the jss since it doesn't always work the first time
 # hopefully someday we don't need to do this :(
 jssenroll="/etc/stripe/facts/jssenroll.txt"
+
+enroll_running=0
+while [ $enroll_running = 0 ]; do
+  echo "Waiting for previous enroll to complete..."
+  set +e
+  ps -ef | grep jamf | grep enroll
+  enroll_running=$?
+  set -e
+  sleep 1
+done
 
 if [ ! -f $jssenroll ]; then
   echo "Re-enrolling to the jss..."
@@ -88,7 +99,7 @@ if [ ! -f $jssenroll ]; then
 fi
 
 # check if filevault is enabled. If not, wait for Casper to enable it.
-fvstatus=$(fdesetup status | grep -c "FileVault is On")
+fvstatus=$(sudo fdesetup status | grep -c "FileVault is On" || true)
 
 if [ $fvstatus = 0 ]; then
     fdedeferstatus=$(sudo fdesetup showdeferralinfo | grep -c "Defer = 1")
@@ -99,10 +110,18 @@ if [ $fvstatus = 0 ]; then
         sleep 5
     done
 
-    echo "Filevault is enabled but requires user to logout. Wait for logout and enter user's password."
+    echo "#####"
+    echo "Filevault is enabled but requires user to logout."
+    echo "Wait for logout and enter user's password..."
+    echo "#####"
+
     sleep 5
-    #make user logout
-    osascript -e 'tell application "System Events"' -e 'log out' -e 'keystroke return' -e end
+
+    # logout and restart
+    osascript -e 'tell application "System Events" to restart'
+
+    # kill the terminal so it doesn't interrupt reboot
+    killall Terminal
 fi
 
 trap 'echo ERROR' EXIT
