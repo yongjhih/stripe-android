@@ -106,7 +106,7 @@ module Yoyo
               Subprocess.check_call(%W{sc-puppet-secrets #{island} },
                                     :env => useful_env)
             end
-            Subprocess.check_call(%w{for-servers -Sat vpn -t intfe stripe-puppet}, :env => useful_env)
+            Subprocess.check_call(%w{for-servers -Sayt vpn -t intfe stripe-puppet}, :env => useful_env)
           end
         end
       end
