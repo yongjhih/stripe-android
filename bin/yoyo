@@ -19,7 +19,7 @@ class Spinup < Chalk::CLI::Command
       :groups => groups,
       :gpg_key => options[:gpg_key],
       :stripe_user => options[:stripe_user],
-      :machine_nubmer => options[:machine],
+      :machine_number => options[:machine].to_s,
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
