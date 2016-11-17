@@ -5,6 +5,7 @@ module Yoyo
   class Manager
     attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key, :machine_number
     attr_reader :gpg_signing_identities
+    attr_reader :puppet_server, :puppet_endpoint
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
@@ -15,6 +16,8 @@ module Yoyo
       @puppet_groups = options[:groups]
       @machine_number = options[:machine_number]
       @gpg_signing_identities = options[:gpg_signing_identities]
+      @puppet_server = options[:puppet_server]
+      @puppet_endpoint = options[:puppet_endpoint]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end

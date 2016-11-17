@@ -20,6 +20,8 @@ class Spinup < Chalk::CLI::Command
       :gpg_key => options[:gpg_key],
       :stripe_user => options[:stripe_user],
       :machine_number => options[:machine].to_s,
+      :puppet_endpoint => options[:puppet_endpoint],
+      :puppet_server => options[:puppet_server]
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
@@ -40,6 +42,10 @@ class Spinup < Chalk::CLI::Command
              :type => :string, :default => nil
     opts.opt :machine, 'Stripe machine number (this goes on "st-userNN")',
              :type => :integer, :default => nil
+    opts.opt :puppet_endpoint, 'Puppet service address to use',
+             :type => :string, :default => 'marionette.corp.stripe.com'
+    opts.opt :puppet_server, 'Puppet server to use for puppet CA actions',
+             :type => :string, :default => 'marionette1.northwest.stripe.io'
   end
   App.action(self)
 end
