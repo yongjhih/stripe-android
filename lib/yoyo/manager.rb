@@ -15,7 +15,7 @@ module Yoyo
       @gpg_key = options[:gpg_key]
       @puppet_groups = options[:groups]
       @machine_number = options[:machine_number]
-      @gpg_signing_identities = options[:gpg_signing_identities]
+      @gpg_signing_identities = options.fetch(:gpg_signing_identities, ['ca'])
       @puppet_server = options[:puppet_server]
       @puppet_endpoint = options[:puppet_endpoint]
 
@@ -41,7 +41,8 @@ module Yoyo
 
       run_steps([
                   Yoyo::Steps::Marionette,
-                  (@skip_certs ? nil : Yoyo::Steps::GenerateCredentials)
+                  (@skip_certs ? nil : Yoyo::Steps::GenerateCredentials),
+                  ((@skip_certs || @gpg_key) ? nil : Yoyo::Steps::GPGSign)
                 ])
       log.info("Finished spin_up!")
     end
@@ -173,6 +174,10 @@ module Yoyo
 
     def gpg_ramdisk_name
       "stripe_gpg_#{gpg_key}"
+    end
+
+    def update_gpg_key(key)
+      @gpg_key = key
     end
 
     private

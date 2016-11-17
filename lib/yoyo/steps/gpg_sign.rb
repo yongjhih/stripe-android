@@ -25,8 +25,8 @@ module Yoyo
       def useful_env
         Bundler.with_clean_env do
           env = ENV.to_hash
-          rbenv_root = ENV['RBENV_ROOT'] || File.expand_path('~/.rbenv/versions')
-          path = env['PATH'].split(':').delete_if {|d| d.start_with?(rbenv_root)}.join(':')
+          rbenv_root = ENV['RBENV_ROOT'] || File.expand_path('~/.rbenv')
+          path = env['PATH'].split(':').delete_if {|d| d.start_with?(File.join(rbenv_root, 'versions'))}.join(':')
           env['PATH'] = path
           env.delete('RBENV_VERSION')
           env
