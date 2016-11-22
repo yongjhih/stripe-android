@@ -4,6 +4,7 @@ require 'space-commander'
 module Yoyo
   class Manager
     attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key, :machine_number
+    attr_reader :gpg_signing_identities
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
@@ -13,6 +14,7 @@ module Yoyo
       @gpg_key = options[:gpg_key]
       @puppet_groups = options[:groups]
       @machine_number = options[:machine_number]
+      @gpg_signing_identities = options[:gpg_signing_identities]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end
@@ -45,6 +47,13 @@ module Yoyo
       log.info("Starting decredential_user!")
       run_steps([
                   Yoyo::Steps::DecredentialUser
+                ])
+    end
+
+    def sign_gpg_key!
+      log.info("Starting GPG signing process")
+      run_steps([
+                  Yoyo::Steps::GPGSign
                 ])
     end
 
@@ -153,6 +162,14 @@ module Yoyo
 
     def first_local_privkey
       first_local_pubkey.split(/\s/, 3)[2]
+    end
+
+    def utility_binary(name)
+      File.expand_path(File.join('..', '..', 'bin', name), File.dirname(__FILE__))
+    end
+
+    def gpg_ramdisk_name
+      "stripe_gpg_#{gpg_key}"
     end
 
     private
