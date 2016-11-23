@@ -66,6 +66,25 @@ class Decredential < Chalk::CLI::Command
   App.action(self)
 end
 
+class GPGSign < Chalk::CLI::Command
+  def invoke
+    command_name, keyid = arguments
+    args = {
+      gpg_key: keyid,
+      gpg_signing_identities: options[:identities].flatten,
+    }
+    mgr = Yoyo::Manager.new(nil, nil, args)
+    mgr.sign_gpg_key!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} gpg-sign [OPTIONS] -- KEYID')
+  App.options do |opts|
+    opts.opt :identities, "Identities to sign the key ID with",
+             :type => :strings, :multi => true, :default => ['ca']
+  end
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -77,6 +96,8 @@ Commands:
     cleanup IP_ADDRESS USERNAME
 
     decredential USERNAME
+
+    gpg-sign KEYID
 
     EOM
   return 1
@@ -90,6 +111,8 @@ def parse_args(args)
     Cleanup::App.run_if_invoked(__FILE__)
   when 'decredential'
     Decredential::App.run_if_invoked(__FILE__)
+  when 'gpg-sign'
+    GPGSign::App.run_if_invoked(__FILE__)
   else
     return usage
   end
