@@ -50,7 +50,8 @@ module Yoyo
     def decredential_user!
       log.info("Starting decredential_user!")
       run_steps([
-                  Yoyo::Steps::DecredentialUser
+                  Yoyo::Steps::DecredentialUser,
+                  Yoyo::Steps::GPGRevoke
                 ])
     end
 

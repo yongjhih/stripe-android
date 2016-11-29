@@ -33,6 +33,44 @@ module Yoyo
       end
 
       def init_steps
+        step 'Determine GPG fingerprint (if any)' do
+          idempotent
+
+          run do
+            Subprocess.check_call(%W{fetch-stripe-gpg-keys}, env: useful_env)
+            output = Subprocess.check_output(%W{gpg --with-colons --list-keys --fingerprint #{mgr.username}})
+            fpr = nil
+            stripe_uid_valid = false
+            output.each_line do |line|
+              components = line.split(':')
+              case components[0]
+              when 'fpr'
+                if stripe_uid_valid
+                  fpr = components[9]
+                  break
+                end
+              when 'uid', 'pub', 'sub'
+                if components[1] != 'u' # 'r' means revoked
+                  fpr = nil
+                  stripe_uid_valid = false
+                  next
+                else
+                  if components[0] == 'uid'
+                    email = Mail::Address.new(components[9])
+                    if email.domain == 'stripe.com' && email.local == mgr.username
+                      stripe_uid_valid = true
+                      next
+                    end
+                  end
+                end
+              end
+            end
+            if fpr && stripe_uid_valid
+              mgr.gpg_key = fpr
+            end
+          end
+        end
+
         %w{stripe.io apiori.com}.each do |domain|
           step "revoke AWS credentials for #{domain}" do
             complete? do

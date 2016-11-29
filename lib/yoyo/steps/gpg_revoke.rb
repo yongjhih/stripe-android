@@ -14,6 +14,14 @@ module Yoyo
         @passphrases.each(&block)
       end
 
+      def run!
+        if mgr.gpg_key.nil?
+          log.info "No GPG key to revoke, so nothing to do"
+          return
+        end
+        super
+      end
+
       def init_gpg_steps
         step 'Retrieve passwords for the identities' do
           idempotent
