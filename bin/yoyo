@@ -91,6 +91,25 @@ class GPGSign < Chalk::CLI::Command
   App.action(self)
 end
 
+class GPGRevoke < Chalk::CLI::Command
+  def invoke
+    command_name, keyid = arguments
+    args = {
+      gpg_key: keyid,
+      gpg_signing_identities: options[:identities].flatten,
+    }
+    mgr = Yoyo::Manager.new(nil, nil, args)
+    mgr.revoke_gpg_key!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} gpg-revoke [OPTIONS] -- KEYID')
+  App.options do |opts|
+    opts.opt :identities, "Identities to revoke signatures on the key ID with",
+             :type => :strings, :multi => true, :default => ['ca', 'deploy']
+  end
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -119,6 +138,8 @@ def parse_args(args)
     Decredential::App.run_if_invoked(__FILE__)
   when 'gpg-sign'
     GPGSign::App.run_if_invoked(__FILE__)
+  when 'gpg-revoke'
+    GPGRevoke::App.run_if_invoked(__FILE__)
   else
     return usage
   end

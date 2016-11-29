@@ -61,6 +61,13 @@ module Yoyo
                 ])
     end
 
+    def revoke_gpg_key!
+      log.info("Starting GPG revocation process")
+      run_steps([
+                  Yoyo::Steps::GPGRevoke
+                ])
+    end
+
     def target_serial
       @target_serial ||= get_target_serial
     end
