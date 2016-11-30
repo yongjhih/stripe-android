@@ -227,17 +227,6 @@ EOM
           end
         end
 
-        step 'ensure puppet dir is clean' do
-          idempotent
-
-          run do
-            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
-            unless git_dir_clean?(puppet_dir)
-              raise "Puppet directory isn't clean. Please clean it up & re-run yoyo"
-            end
-          end
-        end
-
         step 'Wait for SSH key' do
           idempotent
 
@@ -253,40 +242,6 @@ EOM
 
           run do
             set_ssh_key(mgr.ssh.file_read(".ssh/id_rsa_#{stripe_email.address}.pub").chomp)
-          end
-        end
-
-        step 'add user entry to puppet' do
-          complete? do
-            users = puppet_users_list
-            users.fetch('auth::users').fetch(stripe_email.local, nil)
-          end
-
-          run do
-            users = puppet_users_list
-            max_uid = users.fetch('auth::users').map{|_,v| v.fetch(:uid, 9999)}.max
-            users.fetch('auth::users')[stripe_email.local] = {
-              name: stripe_email.name,
-              uid: max_uid + 1,
-              pubkeys: [],
-              privileges: mgr.puppet_groups
-            }
-            File.write(puppet_auth_config, users.to_yaml)
-          end
-        end
-
-        step 'add SSH key to puppet' do
-          complete? do
-            users = puppet_users_list['auth::users']
-            if user_entry = users.fetch(stripe_email.local)
-              user_entry.fetch(:pubkeys).include?(ssh_key)
-            end
-          end
-
-          run do
-            users = puppet_users_list
-            users['auth::users'].fetch(stripe_email.local)[:pubkeys] << ssh_key
-            File.write(puppet_auth_config, users.to_yaml)
           end
         end
 
@@ -351,6 +306,54 @@ EOM
             user = SpaceCommander::Utils.get_stripe_username
             hp_conn = SpaceCommander::SSH::Connection.new(user, 'hackpad1.northwest.stripe.io')
             hp_conn.check_call! %W{sudo hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
+          end
+        end
+
+        step 'wait for puppet dir to become clean' do
+          idempotent
+
+          run do
+            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
+            unless git_dir_clean?(puppet_dir)
+              log.info "Puppet directory isn't clean. Please commit/clean up your other changes to proceed here. I'll wait..."
+              until git_dir_clean?(puppet_dir)
+                sleep 10
+              end
+            end
+          end
+        end
+
+        step 'add user entry to puppet' do
+          complete? do
+            users = puppet_users_list
+            users.fetch('auth::users').fetch(stripe_email.local, nil)
+          end
+
+          run do
+            users = puppet_users_list
+            max_uid = users.fetch('auth::users').map{|_,v| v.fetch(:uid, 9999)}.max
+            users.fetch('auth::users')[stripe_email.local] = {
+              name: stripe_email.name,
+              uid: max_uid + 1,
+              pubkeys: [],
+              privileges: mgr.puppet_groups
+            }
+            File.write(puppet_auth_config, users.to_yaml)
+          end
+        end
+
+        step 'add SSH key to puppet' do
+          complete? do
+            users = puppet_users_list['auth::users']
+            if user_entry = users.fetch(stripe_email.local)
+              user_entry.fetch(:pubkeys).include?(ssh_key)
+            end
+          end
+
+          run do
+            users = puppet_users_list
+            users['auth::users'].fetch(stripe_email.local)[:pubkeys] << ssh_key
+            File.write(puppet_auth_config, users.to_yaml)
           end
         end
 
