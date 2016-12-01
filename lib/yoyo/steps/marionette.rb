@@ -37,7 +37,7 @@ module Yoyo; module Steps
 
         run do
           mgr.ssh_root.check_call! %w{gem update --system}
-          mgr.ssh_root.check_call! %w{gem install --no-ri --no-rdoc --bindir=/usr/local/bin puppet -v ~>3.8}
+          mgr.ssh_root.check_call! %w{gem install --no-ri --no-rdoc --bindir=/usr/local/bin puppet -v ~>3.8.0}
         end
       end
 
