@@ -19,7 +19,9 @@ class Spinup < Chalk::CLI::Command
       :groups => groups,
       :gpg_key => options[:gpg_key],
       :stripe_user => options[:stripe_user],
-      :machine_nubmer => options[:machine],
+      :machine_number => options[:machine].to_s,
+      :puppet_endpoint => options[:puppet_endpoint],
+      :puppet_server => options[:puppet_server]
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
@@ -40,6 +42,10 @@ class Spinup < Chalk::CLI::Command
              :type => :string, :default => nil
     opts.opt :machine, 'Stripe machine number (this goes on "st-userNN")',
              :type => :integer, :default => nil
+    opts.opt :puppet_endpoint, 'Puppet service address to use',
+             :type => :string, :default => 'marionette.corp.stripe.com'
+    opts.opt :puppet_server, 'Puppet server to use for puppet CA actions',
+             :type => :string, :default => 'marionette1.northwest.stripe.io'
   end
   App.action(self)
 end
@@ -85,6 +91,25 @@ class GPGSign < Chalk::CLI::Command
   App.action(self)
 end
 
+class GPGRevoke < Chalk::CLI::Command
+  def invoke
+    command_name, keyid = arguments
+    args = {
+      gpg_key: keyid,
+      gpg_signing_identities: options[:identities].flatten,
+    }
+    mgr = Yoyo::Manager.new(nil, nil, args)
+    mgr.revoke_gpg_key!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} gpg-revoke [OPTIONS] -- KEYID')
+  App.options do |opts|
+    opts.opt :identities, "Identities to revoke signatures on the key ID with",
+             :type => :strings, :multi => true, :default => ['ca', 'deploy']
+  end
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -113,6 +138,8 @@ def parse_args(args)
     Decredential::App.run_if_invoked(__FILE__)
   when 'gpg-sign'
     GPGSign::App.run_if_invoked(__FILE__)
+  when 'gpg-revoke'
+    GPGRevoke::App.run_if_invoked(__FILE__)
   else
     return usage
   end

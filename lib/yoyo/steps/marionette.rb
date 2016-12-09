@@ -1,7 +1,7 @@
 module Yoyo; module Steps
   class Marionette < Yoyo::StepList
-    def marionette_dns; 'marionette.corp.stripe.com'; end
-    def marionette_ssh; 'marionette1.northwest.stripe.io'; end
+    def marionette_dns; mgr.puppet_endpoint; end
+    def marionette_ssh; mgr.puppet_server; end
 
     def init_steps
       step 'set up facts' do
@@ -26,6 +26,11 @@ module Yoyo; module Steps
           if mgr.machine_number
             mgr.ssh_root.file_write('/etc/stripe/facts/machinenumber.txt',
                                     mgr.machine_number + "\n")
+          end
+
+          if mgr.puppet_endpoint
+            mgr.ssh_root.file_write('/etc/stripe/facts/puppetserver.txt',
+                                    marionette_dns + "\n")
           end
         end
       end

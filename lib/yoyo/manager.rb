@@ -5,6 +5,7 @@ module Yoyo
   class Manager
     attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key, :machine_number
     attr_reader :gpg_signing_identities
+    attr_reader :puppet_server, :puppet_endpoint
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
@@ -14,7 +15,9 @@ module Yoyo
       @gpg_key = options[:gpg_key]
       @puppet_groups = options[:groups]
       @machine_number = options[:machine_number]
-      @gpg_signing_identities = options[:gpg_signing_identities]
+      @gpg_signing_identities = options.fetch(:gpg_signing_identities, ['ca'])
+      @puppet_server = options[:puppet_server]
+      @puppet_endpoint = options[:puppet_endpoint]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end
@@ -38,7 +41,8 @@ module Yoyo
 
       run_steps([
                   Yoyo::Steps::Marionette,
-                  (@skip_certs ? nil : Yoyo::Steps::GenerateCredentials)
+                  (@skip_certs ? nil : Yoyo::Steps::GenerateCredentials),
+                  ((@skip_certs || @gpg_key) ? nil : Yoyo::Steps::GPGSign)
                 ])
       log.info("Finished spin_up!")
     end
@@ -46,7 +50,8 @@ module Yoyo
     def decredential_user!
       log.info("Starting decredential_user!")
       run_steps([
-                  Yoyo::Steps::DecredentialUser
+                  Yoyo::Steps::DecredentialUser,
+                  Yoyo::Steps::GPGRevoke
                 ])
     end
 
@@ -54,6 +59,13 @@ module Yoyo
       log.info("Starting GPG signing process")
       run_steps([
                   Yoyo::Steps::GPGSign
+                ])
+    end
+
+    def revoke_gpg_key!
+      log.info("Starting GPG revocation process")
+      run_steps([
+                  Yoyo::Steps::GPGRevoke
                 ])
     end
 
@@ -170,6 +182,10 @@ module Yoyo
 
     def gpg_ramdisk_name
       "stripe_gpg_#{gpg_key}"
+    end
+
+    def update_gpg_key(key)
+      @gpg_key = key
     end
 
     private
