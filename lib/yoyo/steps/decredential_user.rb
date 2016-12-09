@@ -12,6 +12,7 @@ module Yoyo
     # possible.
     class DecredentialUser < Yoyo::StepList
       include DotStripeMixin
+      include MinitrueMixin
 
       def vpnmaker
         @vpnmaker ||= VPNMaker::Manager.new(File.expand_path("~/.stripe/stripe.vpn/"))
@@ -87,6 +88,31 @@ module Yoyo
 
             run do
               Subprocess.check_call(%W{sc-iam delete-user #{domain} #{mgr.username}}, :env => useful_env)
+            end
+          end
+        end
+
+        step 'Revoke minitrue certs on all regions' do
+          idempotent
+
+          run do
+            unless gpg_smartcard_ready?
+              log.error("I can't yet access your yubikey / smartcard. Please insert it into this computer. I'll wait.")
+              until gpg_smartcard_ready?
+                sleep 2
+              end
+            end
+
+            MINITRUE_REGIONS.each do |region|
+              url = "https://#{region}.stripe-ca.com/"
+              # TODO: Once we can specify a serial nunmber (for
+              # theft-revocation purposes), we should limit ourselves
+              # only to those serial numbers. Right now, that's not
+              # possible though.
+              Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/}).each_line do |cert|
+                Subprocess.check_call(%W{minitrue revoke --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --name #{cert}},
+                                      stdout: nil)
+              end
             end
           end
         end

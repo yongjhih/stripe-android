@@ -9,6 +9,8 @@ module Yoyo;
   module Steps
     class GenerateCredentials < Yoyo::StepList
       include DotStripeMixin
+      include MinitrueMixin
+
       def set_ssh_key(ssh_key)
         @ssh_key = ssh_key
       end
@@ -31,14 +33,6 @@ module Yoyo;
           end
         end
         nil
-      end
-
-      def gpg_smartcard_ready?
-        begin
-          Subprocess.check_call(%w{gpg --no-tty --card-status}, cwd: '/', stdout: nil, stderr: nil)
-        rescue Subprocess::NonZeroExit
-          false
-        end
       end
 
       def stripe_email
@@ -217,11 +211,10 @@ EOM
               end
             end
             # Now issue it:
-            admin_cert = File.expand_path('~/.stripe-ca/admin.crt')
             Tempfile.create('client-cert') do |cert|
               cert.write(client_certificate)
               cert.flush
-              Subprocess.check_call(%W{minitrue sign --issuer=people --server https://stripe-ca.com --gpg-scd --client-cert #{admin_cert} --x509 #{cert.path}})
+              Subprocess.check_call(%W{minitrue sign --issuer=people --server https://stripe-ca.com --gpg-scd --client-cert #{minitrue_admin_cert} --x509 #{cert.path}})
               mgr.ssh.file_write(".stripe-certs/spinup/openssl_cert.pem", File.read(cert.path))
             end
           end
