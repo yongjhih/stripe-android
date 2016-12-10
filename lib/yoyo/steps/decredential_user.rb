@@ -109,7 +109,15 @@ module Yoyo
               # theft-revocation purposes), we should limit ourselves
               # only to those serial numbers. Right now, that's not
               # possible though.
-              Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/}).each_line do |cert|
+              certs = []
+              begin
+                certs = Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/},
+                                                stderr: nil)
+              rescue Subprocess::NonZeroExit
+                # No certificates found in this region, continue:
+                next
+              end
+              certs.each_line do |cert|
                 Subprocess.check_call(%W{minitrue revoke --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --name #{cert}},
                                       stdout: nil)
               end
