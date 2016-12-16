@@ -58,8 +58,8 @@ module Yoyo; module Steps
           log.info("Cleaning up any residual puppet state...")
           mgr.ssh_root.call! %w{rm -rf /etc/puppet/ssl}
           begin
-            marionette_ssh.check_call! %{sudo marionette-cert clean #{mgr.target_certname}}
-          rescue Subprocess::NonZeroExit
+            marionette_ssh.check_call! %W{sudo marionette-cert clean #{mgr.target_certname}}
+          rescue SpaceCommander::SSH::CommandError
             # It's fine for the cleanup to fail if no cert exists under that name.
           end
 
