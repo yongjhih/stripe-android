@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mail'
   spec.add_dependency 'chalk-cli'
   spec.add_dependency 'octokit'
+  spec.add_dependency 'excon'
 end

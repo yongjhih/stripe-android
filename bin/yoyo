@@ -21,7 +21,8 @@ class Spinup < Chalk::CLI::Command
       :stripe_user => options[:stripe_user],
       :machine_number => options[:machine].to_s,
       :puppet_endpoint => options[:puppet_endpoint],
-      :puppet_server => options[:puppet_server]
+      :puppet_server => options[:puppet_server],
+      :ldapmanager_server => options[:ldapmanager_server],
     }
 
     mgr = Yoyo::Manager.new(ip_address, username, args)
@@ -46,6 +47,8 @@ class Spinup < Chalk::CLI::Command
              :type => :string, :default => 'marionette.corp.stripe.com'
     opts.opt :puppet_server, 'Puppet server to use for puppet CA actions',
              :type => :string, :default => 'marionette1.northwest.stripe.io'
+    opts.opt :ldapmanager_server, 'LDAP manager server to use for adding the user',
+             :type => :string, :default => 'ldapmanager.corp.stripe.com'
   end
   App.action(self)
 end
