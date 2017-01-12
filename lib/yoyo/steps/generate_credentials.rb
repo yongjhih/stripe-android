@@ -1,6 +1,8 @@
 require 'sixword'
 require 'mail'
 require 'octokit'
+require 'excon'
+require 'json'
 
 # I debug things:
 require 'pry'
@@ -44,14 +46,6 @@ module Yoyo;
           end
       end
 
-      def puppet_auth_config
-        File.expand_path('~/stripe/puppet-config/yaml/auth.yaml')
-      end
-
-      def puppet_users_list
-        YAML.load_file(puppet_auth_config)
-      end
-
       def fingerprint_equivalent_to_key?(keyid)
         output = Subprocess.check_output(%W{gpg --fingerprint --fingerprint --with-colons #{keyid}})
         !output.scan(/^fpr:+:#{fingerprint.upcase}:$/).empty?
@@ -65,6 +59,12 @@ module Yoyo;
             secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
             Octokit::Client.new(:access_token => secret['auth_token'])
           end
+      end
+
+      def ldapmanager_conn
+        @conn ||= Excon.new("http://#{mgr.ldapmanager_server}",
+                            proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
+                            persistent: true)
       end
 
       # Strip the final comment from the ssh key (this is how the
@@ -302,63 +302,47 @@ EOM
           end
         end
 
-        step 'wait for puppet dir to become clean' do
-          idempotent
+        step 'Add new user to LDAP using ldapmanager' do
+          complete? do
+            resp = ldapmanager_conn.get(path: "/api/v1/users/#{stripe_email.local}")
 
-          run do
-            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
-            unless git_dir_clean?(puppet_dir)
-              log.info "Puppet directory isn't clean. Please commit/clean up your other changes to proceed here. I'll wait..."
-              until git_dir_clean?(puppet_dir)
-                sleep 10
-              end
+            if resp.status == 200
+              true
+            elsif resp.status == 400
+              false
+            else
+              raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
             end
           end
-        end
-
-        step 'add user entry to puppet' do
-          complete? do
-            users = puppet_users_list
-            users.fetch('auth::users').fetch(stripe_email.local, nil)
-          end
 
           run do
-            users = puppet_users_list
-            max_uid = users.fetch('auth::users').map{|_,v| v.fetch(:uid, 9999)}.max
-            users.fetch('auth::users')[stripe_email.local] = {
-              name: stripe_email.name,
-              uid: max_uid + 1,
+            create_request = {
+              username: stripe_email.local,
+              name: stripe_name,
+
+              privileges: mgr.puppet_groups,
               pubkeys: [],
-              privileges: mgr.puppet_groups
             }
-            File.write(puppet_auth_config, users.to_yaml)
+            resp = ldapmanager_conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
+            raise "error creating user:\n#{resp.inspect}" if resp.status != 200
           end
         end
 
-        step 'add SSH key to puppet' do
+        step 'Add SSH key to LDAP using ldapmanager' do
           complete? do
-            users = puppet_users_list['auth::users']
-            if user_entry = users.fetch(stripe_email.local)
-              user_entry.fetch(:pubkeys).include?(ssh_key)
-            end
+            resp = ldapmanager_conn.get(path: "/api/v1/users/#{stripe_email.local}")
+
+            # We must have the user, since it gets created above.
+            raise "User not found in ldapmanager" unless resp.status == 200
+
+            user_info = JSON.load(resp.body)
+            user_info['public_keys'].include?(ssh_key)
           end
 
           run do
-            users = puppet_users_list
-            users['auth::users'].fetch(stripe_email.local)[:pubkeys] << ssh_key
-            File.write(puppet_auth_config, users.to_yaml)
-          end
-        end
-
-        step 'Wait for puppet to be committed' do
-          idempotent
-
-          run do
-            puppet_dir = File.expand_path('../', File.dirname(puppet_auth_config))
-            until git_dir_clean?(puppet_dir)
-              log.warn("Puppet directory still has our uncommitted changes in it - please commit and push!")
-              sleep 10
-            end
+            body = {public_key: ssh_key}
+            resp = ldapmanager_conn.post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
+            raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 200
           end
         end
       end
