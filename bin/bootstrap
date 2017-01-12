@@ -23,7 +23,7 @@ wait_for_network() {
 }
 
 default_password_set() {
-    default_password='falafels'
+    default_password='llamafalafels'
     sudo -k
     if dscl . -passwd /Users/$USER "$default_password" "$default_password" >/dev/null 2>/dev/null ; then
         return 0
