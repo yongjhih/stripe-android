@@ -37,11 +37,17 @@ module Yoyo;
         nil
       end
 
+      def full_name
+        @full_name ||=
+          begin
+            mgr.ssh.check_output!(%W{dscl . read /Users/#{mgr.username} RealName}).split("\n")[1]
+          end
+      end
+
       def stripe_email
         @email ||=
           begin
             stripe_user = mgr.stripe_username || mgr.username
-            full_name = mgr.ssh.check_output!(%W{dscl . read /Users/#{mgr.username} RealName}).split("\n")[1]
             Mail::Address.new("\"#{full_name}\" <#{stripe_user}@stripe.com>")
           end
       end
@@ -318,7 +324,7 @@ EOM
           run do
             create_request = {
               username: stripe_email.local,
-              name: stripe_name,
+              name: full_name,
 
               privileges: mgr.puppet_groups,
               pubkeys: [],
