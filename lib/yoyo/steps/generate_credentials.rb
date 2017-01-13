@@ -348,7 +348,9 @@ EOM
           run do
             body = {public_key: ssh_key}
             resp = ldapmanager_conn.post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
-            raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 200
+
+            # Note: this returns a 204 No Content
+            raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 204
           end
         end
       end
