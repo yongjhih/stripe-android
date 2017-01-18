@@ -396,6 +396,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Y28TH9SHX7;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
 				INFOPLIST_FILE = "Marionette Bootstrap/Marionette Bootstrap-Info.plist";
@@ -412,6 +413,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Y28TH9SHX7;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Marionette Bootstrap/Marionette Bootstrap-Prefix.pch";
 				INFOPLIST_FILE = "Marionette Bootstrap/Marionette Bootstrap-Info.plist";
