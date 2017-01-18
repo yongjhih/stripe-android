@@ -5,6 +5,11 @@ set -o pipefail
 # invitation for enrolling to jss
 enrollment_invite='318026568035627000628803707608018703959'
 
+# Set at imaging time, must be reset before we actually get anywhere
+# that places certs on this machine:
+default_password='llamafalafels'
+
+
 run() {
     echo >&2 "+ $*"
     "$@"
@@ -23,7 +28,6 @@ wait_for_network() {
 }
 
 default_password_set() {
-    default_password='llamafalafels'
     sudo -k
     if dscl . -passwd /Users/$USER "$default_password" "$default_password" >/dev/null 2>/dev/null ; then
         return 0
@@ -41,24 +45,6 @@ run_background_jobs() {
     caffeinate -ids &
     local caffeinate_pid=$!
 }
-
-generate_input_plist() {
-    local user_password="$1"
-    cat <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-<key>Password</key>
-<string>$user_password</string>
-</dict>
-</plist>
-EOF
-}
-
-# Set at imaging time, must be reset before we actually get anywhere
-# that places certs on this machine:
-default_password='falafels'
 
 # we shouldn't be root when running this
 if [ "$(id -u)" -eq 0 ]; then
