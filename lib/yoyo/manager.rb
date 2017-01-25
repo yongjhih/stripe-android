@@ -6,7 +6,6 @@ module Yoyo
     attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key, :machine_number
     attr_reader :gpg_signing_identities
     attr_reader :puppet_server, :puppet_endpoint
-    attr_reader :ldapmanager_server
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
@@ -19,7 +18,6 @@ module Yoyo
       @gpg_signing_identities = options.fetch(:gpg_signing_identities, ['ca'])
       @puppet_server = options[:puppet_server]
       @puppet_endpoint = options[:puppet_endpoint]
-      @ldapmanager_server = options[:ldapmanager_server]
 
       log.info("Preparing to spin up #{username}@#{ip_address}")
     end

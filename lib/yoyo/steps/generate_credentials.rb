@@ -61,10 +61,11 @@ module Yoyo;
           end
       end
 
-      def ldapmanager_conn
-        @conn ||= Excon.new("http://#{mgr.ldapmanager_server}",
-                            proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
-                            persistent: true)
+      def proxy_conn(host)
+        @conns ||= {}
+        @conns[host] ||= Excon.new("http://#{host}",
+                                   proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
+                                   persistent: true)
       end
 
       # Strip the final comment from the ssh key (this is how the
@@ -302,49 +303,51 @@ EOM
           end
         end
 
-        step 'Add new user to LDAP using ldapmanager' do
-          complete? do
-            resp = ldapmanager_conn.get(path: "/api/v1/users/#{stripe_email.local}")
+        ['ldapmanager.corp.stripe.com', 'ldapmanager.qa.corp.stripe.com'].each do |env|
+          step "Add new user to LDAP using ldapmanager (host: #{host})" do
+            complete? do
+              resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
 
-            if resp.status == 200
-              true
-            elsif resp.status == 400
-              false
-            else
-              raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
+              if resp.status == 200
+                true
+              elsif resp.status == 400
+                false
+              else
+                raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
+              end
+            end
+
+            run do
+              create_request = {
+                username: stripe_email.local,
+                name: stripe_email.name,
+
+                groups: mgr.puppet_groups,
+                pubkeys: [],
+              }
+              resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
+              raise "error creating user:\n#{resp.inspect}" if resp.status != 200
             end
           end
 
-          run do
-            create_request = {
-              username: stripe_email.local,
-              name: stripe_email.name,
+          step "Add SSH key to LDAP using ldapmanager (host: #{host})" do
+            complete? do
+              resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
 
-              groups: mgr.puppet_groups,
-              pubkeys: [],
-            }
-            resp = ldapmanager_conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
-            raise "error creating user:\n#{resp.inspect}" if resp.status != 200
-          end
-        end
+              # We must have the user, since it gets created above.
+              raise "User not found in ldapmanager" unless resp.status == 200
 
-        step 'Add SSH key to LDAP using ldapmanager' do
-          complete? do
-            resp = ldapmanager_conn.get(path: "/api/v1/users/#{stripe_email.local}")
+              user_info = JSON.load(resp.body)
+              user_info['public_keys'].include?(ssh_key)
+            end
 
-            # We must have the user, since it gets created above.
-            raise "User not found in ldapmanager" unless resp.status == 200
+            run do
+              body = {public_key: ssh_key}
+              resp = proxy_conn(host).post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
 
-            user_info = JSON.load(resp.body)
-            user_info['public_keys'].include?(ssh_key)
-          end
-
-          run do
-            body = {public_key: ssh_key}
-            resp = ldapmanager_conn.post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
-
-            # Note: this returns a 204 No Content
-            raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 204
+              # Note: this returns a 204 No Content
+              raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 204
+            end
           end
         end
       end
