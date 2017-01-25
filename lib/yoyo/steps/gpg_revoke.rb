@@ -43,7 +43,7 @@ module Yoyo
             # moment, or keys that don't have the CA identity as a
             # designated revoker:
             !mgr.gpg_signing_identities.include?('ca') ||
-              revokers.find { |revoker| revoker.split(':')[6] != signing_identities['ca'] }
+              !revokers.find { |revoker| revoker.split(':')[6] != signing_identities['ca'] }
           end
 
           run do
