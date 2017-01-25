@@ -305,7 +305,7 @@ EOM
           end
         end
 
-        LDAPMANAGER_HOSTS.each do |env|
+        LDAPMANAGER_HOSTS.each do |host|
           step "Add new user to LDAP using ldapmanager (host: #{host})" do
             complete? do
               resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
