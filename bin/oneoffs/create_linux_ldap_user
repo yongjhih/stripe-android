@@ -4,26 +4,29 @@ require_relative '../../lib/yoyo'
 require 'excon'
 
 class AddUser
-  def ldapmanager_conn
-    @conn ||= Excon.new("http://ldapmanager.corp.stripe.com",
-                        proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
-                        persistent: true)
+  def ldapmanager_conns(&blk)
+    ["http://ldapmanager.corp.stripe.com", "http://ldapmanager.qa.corp.stripe.com"].each do |url|
+      blk.call (Excon.new("http://ldapmanager.corp.stripe.com",
+                          proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
+                          persistent: true))
+    end
   end
 
   def add_user(user, fullname, ssh_key)
-    if ldapmanager_conn.get(path: "/api/v1/users/#{user}").status == 400
-      create_request = {
-        username: user,
-        name: fullname,
+    ldapmanager_conns do |conn|
+      if conn.get(path: "/api/v1/users/#{user}").status == 400
+        create_request = {
+          username: user,
+          name: fullname,
 
-        pubkeys: [ssh_key],
-        privileges: [],
-        pubkeys: [],
-      }
-      ldapmanager_conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
-    else
+          pubkeys: [ssh_key],
+          groups: ['stripe'],
+          pubkeys: [],
+        }
+        conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
+      end
       body={public_key: ssh_key}
-      ldapmanager_conn.post(path: "/api/v1/users/#{user}", body: JSON.dump(body))
+      conn.post(path: "/api/v1/users/#{user}", body: JSON.dump(body))
     end
   end
 
