@@ -320,7 +320,7 @@ EOM
               username: stripe_email.local,
               name: stripe_email.name,
 
-              privileges: mgr.puppet_groups,
+              groups: mgr.puppet_groups,
               pubkeys: [],
             }
             resp = ldapmanager_conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
