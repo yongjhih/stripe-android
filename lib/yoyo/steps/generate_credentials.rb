@@ -70,6 +70,18 @@ module Yoyo;
                                    persistent: true)
       end
 
+      def user_exists_in_ldapmanager?(host)
+        resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
+
+        if resp.status == 200
+          true
+        elsif resp.status == 400
+          false
+        else
+          raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
+        end
+      end
+
       # Strip the final comment from the ssh key (this is how the
       # github API stores/returns it)
       def ssh_key_bare
@@ -305,33 +317,50 @@ EOM
           end
         end
 
-        LDAPMANAGER_HOSTS.each do |host|
-          step "Add new user to LDAP using ldapmanager (host: #{host})" do
-            complete? do
-              resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
-
-              if resp.status == 200
-                true
-              elsif resp.status == 400
-                false
-              else
-                raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
-              end
-            end
-
-            run do
-              create_request = {
-                username: stripe_email.local,
-                name: stripe_email.name,
-
-                groups: mgr.puppet_groups,
-                pubkeys: [],
-              }
-              resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
-              raise "error creating user:\n#{resp.inspect}" if resp.status != 200
-            end
+        step "Add new user to LDAP using ldapmanager (prod)" do
+          host = 'ldapmanager.corp.stripe.com'
+          complete? do
+            user_exists_in_ldapmanager?(host)
           end
 
+          run do
+            create_request = {
+              username: stripe_email.local,
+              name: stripe_email.name,
+
+              groups: mgr.puppet_groups,
+              pubkeys: [],
+            }
+            resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
+            raise "error creating user:\n#{resp.inspect}" if resp.status != 200
+
+            # Save the UID so we can use it in QA.
+            @unix_uid = resp.uid
+          end
+        end
+
+        step "Add new user to LDAP using ldapmanager (QA)" do
+          host = 'ldapmanager.qa.corp.stripe.com'
+
+          complete? do
+            user_exists_in_ldapmanager?(host)
+          end
+
+          run do
+            create_request = {
+              username: stripe_email.local,
+              name: stripe_email.name,
+              uid: @unix_uid, # from creating our prod user
+
+              groups: mgr.puppet_groups,
+              pubkeys: [],
+            }
+            resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
+            raise "error creating user:\n#{resp.inspect}" if resp.status != 200
+          end
+        end
+
+        LDAPMANAGER_HOSTS.each do |host|
           step "Add SSH key to LDAP using ldapmanager (host: #{host})" do
             complete? do
               resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
