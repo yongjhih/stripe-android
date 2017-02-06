@@ -335,7 +335,8 @@ EOM
             raise "error creating user:\n#{resp.inspect}" if resp.status != 200
 
             # Save the UID so we can use it in QA.
-            @unix_uid = resp.uid
+            respj = JSON.load(resp.body)
+            @unix_uid = respj['uid']
           end
         end
 
