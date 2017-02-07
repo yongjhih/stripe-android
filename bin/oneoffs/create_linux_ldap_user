@@ -16,7 +16,8 @@ class AddUser
   def add_user(user, fullname, ssh_key)
     # Step 1: add user to prod, so we get their UID.
     ldapmanager_conn(LDAPMANAGER_PROD) do |conn|
-      if conn.get(path: "/api/v1/users/#{user}").status == 400
+      resp = conn.get(path: "/api/v1/users/#{user}")
+      if resp.status == 400
         create_request = {
           username: user,
           name: fullname,
@@ -27,10 +28,10 @@ class AddUser
         }
         resp = conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
         raise "error creating user (prod):\n#{resp.inspect}" if resp.status != 200
-
-        respj = JSON.load(resp.body)
-        @unix_uid = respj['uid']
       end
+
+      respj = JSON.load(resp.body)
+      @unix_uid = respj['uid']
     end
 
     # Step 2: add user to QA with the given UID
