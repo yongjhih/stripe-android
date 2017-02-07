@@ -74,9 +74,10 @@ module Yoyo;
         resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
 
         if resp.status == 200
-          true
+          respj = JSON.load(resp.body)
+          [true, respj['uid']]
         elsif resp.status == 400
-          false
+          [false, nil]
         else
           raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
         end
@@ -320,7 +321,8 @@ EOM
         step "Add new user to LDAP using ldapmanager (prod)" do
           host = 'ldapmanager.corp.stripe.com'
           complete? do
-            user_exists_in_ldapmanager?(host)
+            exists, @unix_uid = user_exists_in_ldapmanager?(host)
+            exists
           end
 
           run do
@@ -344,7 +346,8 @@ EOM
           host = 'ldapmanager.qa.corp.stripe.com'
 
           complete? do
-            user_exists_in_ldapmanager?(host)
+            exists, _ = user_exists_in_ldapmanager?(host)
+            exists
           end
 
           run do
