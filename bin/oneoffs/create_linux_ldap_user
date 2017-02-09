@@ -4,17 +4,20 @@ require_relative '../../lib/yoyo'
 require 'excon'
 
 class AddUser
-  def ldapmanager_conns(&blk)
-    ["http://ldapmanager.corp.stripe.com", "http://ldapmanager.qa.corp.stripe.com"].each do |url|
-      blk.call (Excon.new("http://ldapmanager.corp.stripe.com",
+  LDAPMANAGER_PROD = 'ldapmanager.corp.stripe.com'
+  LDAPMANAGER_QA = 'ldapmanager.qa.corp.stripe.com'
+
+  def ldapmanager_conn(host, &blk)
+      blk.call (Excon.new("http://#{host}",
                           proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
                           persistent: true))
-    end
   end
 
   def add_user(user, fullname, ssh_key)
-    ldapmanager_conns do |conn|
-      if conn.get(path: "/api/v1/users/#{user}").status == 400
+    # Step 1: add user to prod, so we get their UID.
+    ldapmanager_conn(LDAPMANAGER_PROD) do |conn|
+      resp = conn.get(path: "/api/v1/users/#{user}")
+      if resp.status == 400
         create_request = {
           username: user,
           name: fullname,
@@ -23,10 +26,38 @@ class AddUser
           groups: ['stripe'],
           pubkeys: [],
         }
-        conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
+        resp = conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
+        raise "error creating user (prod):\n#{resp.inspect}" if resp.status != 200
       end
-      body={public_key: ssh_key}
-      conn.post(path: "/api/v1/users/#{user}", body: JSON.dump(body))
+
+      respj = JSON.load(resp.body)
+      @unix_uid = respj['uid']
+    end
+
+    # Step 2: add user to QA with the given UID
+    ldapmanager_conn(LDAPMANAGER_QA) do |conn|
+      if conn.get(path: "/api/v1/users/#{user}").status == 400
+        create_request = {
+          username: user,
+          name: fullname,
+          uid: @unix_uid,
+
+          pubkeys: [ssh_key],
+          groups: ['stripe'],
+          pubkeys: [],
+        }
+        resp = conn.post(path: '/api/v1/users', body: JSON.dump(create_request))
+        raise "error creating user (QA):\n#{resp.inspect}" if resp.status != 200
+      end
+    end
+
+    # Step 3: add the user's SSH key everywhere
+    [LDAPMANAGER_PROD, LDAPMANAGER_QA].each do |host|
+      ldapmanager_conn(host) do |conn|
+        body = {public_key: ssh_key}
+        resp = conn.post(path: "/api/v1/users/#{user}", body: JSON.dump(body))
+        raise "error adding SSH key (#{host}):\n#{resp.inspect}" if resp.status != 204
+      end
     end
   end
 
