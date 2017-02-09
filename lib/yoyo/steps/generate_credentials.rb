@@ -74,10 +74,9 @@ module Yoyo;
         resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
 
         if resp.status == 200
-          respj = JSON.load(resp.body)
-          [true, respj['uid']]
+          true
         elsif resp.status == 400
-          [false, nil]
+          false
         else
           raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
         end
@@ -321,8 +320,7 @@ EOM
         step "Add new user to LDAP using ldapmanager (prod)" do
           host = 'ldapmanager.corp.stripe.com'
           complete? do
-            exists, @unix_uid = user_exists_in_ldapmanager?(host)
-            exists
+            user_exists_in_ldapmanager?(host)
           end
 
           run do
@@ -335,26 +333,28 @@ EOM
             }
             resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
             raise "error creating user:\n#{resp.inspect}" if resp.status != 200
-
-            # Save the UID so we can use it in QA.
-            respj = JSON.load(resp.body)
-            @unix_uid = respj['uid']
           end
         end
 
         step "Add new user to LDAP using ldapmanager (QA)" do
           host = 'ldapmanager.qa.corp.stripe.com'
+          prod_host = 'ldapmanager.corp.stripe.com'
 
           complete? do
-            exists, _ = user_exists_in_ldapmanager?(host)
-            exists
+            user_exists_in_ldapmanager?(host)
           end
 
           run do
+            resp = proxy_conn(prod_host).get(path: "/api/v1/users/#{stripe_email.local}")
+            raise "user should exist in prod:\n#{resp.inspect}" if resp.status != 200
+
+            unix_uid = JSON.load(resp.body)['uid']
+            raise "invalid uid: #{unix_uid.inspect}" unless unix_uid.is_a?(Integer)
+
             create_request = {
               username: stripe_email.local,
               name: stripe_email.name,
-              uid: @unix_uid, # from creating our prod user
+              uid: unix_uid,
 
               groups: mgr.puppet_groups,
               pubkeys: [],
