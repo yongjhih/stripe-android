@@ -104,7 +104,7 @@ module Yoyo
             end
 
             MINITRUE_REGIONS.each do |region|
-              url = "https://#{region}.stripe-ca.com/"
+              url = "https://#{region}.stripe-ca.com"
               # TODO: Once we can specify a serial nunmber (for
               # theft-revocation purposes), we should limit ourselves
               # only to those serial numbers. Right now, that's not
@@ -122,6 +122,8 @@ module Yoyo
                 # slash, which means revoking "dave" will revoke
                 # "davelev" also.
                 next unless cert.start_with?("#{mgr.username}/")
+                cert.chomp!
+                log.info("Revoking certificate #{cert}")
                 Subprocess.check_call(%W{minitrue revoke --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --name #{cert}},
                                       stdout: nil)
               end
