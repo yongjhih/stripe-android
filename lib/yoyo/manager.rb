@@ -3,9 +3,10 @@ require 'space-commander'
 
 module Yoyo
   class Manager
-    attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :gpg_key, :machine_number
+    attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :machine_number
     attr_reader :gpg_signing_identities
     attr_reader :puppet_server, :puppet_endpoint
+    attr_accessor :gpg_key
 
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
@@ -51,7 +52,7 @@ module Yoyo
       log.info("Starting decredential_user!")
       run_steps([
                   Yoyo::Steps::DecredentialUser,
-                  Yoyo::Steps::GPGRevoke
+                  Yoyo::Steps::GPGRevokeAll
                 ])
     end
 

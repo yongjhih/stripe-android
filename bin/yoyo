@@ -68,7 +68,7 @@ class Decredential < Chalk::CLI::Command
     mgr.decredential_user!
   end
 
-  App = Chalk::CLI::App.new('Usage: #{$0} decredential USERNAME')
+  App = Chalk::CLI::App.new("Usage: #{$0} decredential USERNAME")
   App.action(self)
 end
 
