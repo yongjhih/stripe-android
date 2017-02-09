@@ -25,7 +25,6 @@ module Yoyo
       def unrevoked_contractor_serials(username)
         index = contractor_ca_index
         entries_for_user = index.select do |entry|
-          puts entry
           if dn = OpenSSL::X509::Name.parse(entry[5])
             dn.to_a.find { |component| component[0] == 'CN' && component[1] == username}
           end
