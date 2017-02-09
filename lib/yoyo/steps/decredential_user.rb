@@ -109,13 +109,8 @@ module Yoyo
               # only to those serial numbers. Right now, that's not
               # possible though.
               certs = []
-              begin
-                certs = Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/},
-                                                stderr: nil)
-              rescue Subprocess::NonZeroExit
-                # No certificates found in this region, continue:
-                next
-              end
+              certs = Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/},
+                                              stderr: nil)
               certs.each_line do |cert|
                 # minitrue list will return prefixes *before* the
                 # slash, which means revoking "dave" will revoke
