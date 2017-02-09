@@ -118,6 +118,10 @@ module Yoyo
                 next
               end
               certs.each_line do |cert|
+                # minitrue list will return prefixes *before* the
+                # slash, which means revoking "dave" will revoke
+                # "davelev" also.
+                next unless cert.start_with?("#{mgr.username}/")
                 Subprocess.check_call(%W{minitrue revoke --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --name #{cert}},
                                       stdout: nil)
               end
