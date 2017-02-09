@@ -25,7 +25,6 @@ module Yoyo
       def unrevoked_contractor_serials(username)
         index = contractor_ca_index
         entries_for_user = index.select do |entry|
-          puts entry
           if dn = OpenSSL::X509::Name.parse(entry[5])
             dn.to_a.find { |component| component[0] == 'CN' && component[1] == username}
           end
@@ -104,20 +103,21 @@ module Yoyo
             end
 
             MINITRUE_REGIONS.each do |region|
-              url = "https://#{region}.stripe-ca.com/"
+              url = "https://#{region}.stripe-ca.com"
               # TODO: Once we can specify a serial nunmber (for
               # theft-revocation purposes), we should limit ourselves
               # only to those serial numbers. Right now, that's not
               # possible though.
               certs = []
-              begin
-                certs = Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/},
-                                                stderr: nil)
-              rescue Subprocess::NonZeroExit
-                # No certificates found in this region, continue:
-                next
-              end
+              certs = Subprocess.check_output(%W{minitrue list --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --prefix #{mgr.username}/},
+                                              stderr: nil)
               certs.each_line do |cert|
+                # minitrue list will return prefixes *before* the
+                # slash, which means revoking "dave" will revoke
+                # "davelev" also.
+                next unless cert.start_with?("#{mgr.username}/")
+                cert.chomp!
+                log.info("Revoking certificate #{cert}")
                 Subprocess.check_call(%W{minitrue revoke --server #{url} --client-cert #{minitrue_admin_cert} --gpg-scd --issuer=people --x509 --name #{cert}},
                                       stdout: nil)
               end
