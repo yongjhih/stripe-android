@@ -95,7 +95,7 @@ module Yoyo; module Steps
         end
 
         run do
-          out, err, status = mgr.ssh_root.exec!("cd /;" +
+          out, err, status = mgr.ssh_root.call_shell!("cd /;" +
             " unset TMPDIR;" +
             " /usr/local/bin/puppet agent --test --server '#{step_list.marionette_dns}'" +
             " --certname '#{mgr.target_certname}'")
