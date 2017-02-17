@@ -33,4 +33,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'chalk-cli'
   spec.add_dependency 'octokit'
   spec.add_dependency 'excon'
+
+  spec.add_dependency 'net-ssh', '~> 4.0.1.stripe.1'
+	spec.add_dependency 'net-sftp', '~> 2.1.2'
+	spec.add_dependency 'net-ssh-gateway', '~> 2.0.0'
+
+	# TEMP -> move this to s-c
+	spec.add_dependency 'u2f_client', '~> 0.1'
 end
