@@ -52,13 +52,13 @@ module Yoyo; module Steps
         end
 
         run do
-          marionette_server = SpaceCommander::Servers.new(step_list.marionette_ssh)
+          marionette_server = SpaceCommander::Server.new(step_list.marionette_ssh)
 
           log.info("Cleaning up any residual puppet state...")
           mgr.ssh_root.call! %w{rm -rf /etc/puppet/ssl}
           begin
 						marionette_server.ssh_cmd_check_call %W{sudo marionette-cert clean #{mgr.target_certname}}
-          rescue Yoyo::SSH::CommandError
+          rescue Subprocess::NonZeroExit
             # It's fine for the cleanup to fail if no cert exists under that name.
           end
 
