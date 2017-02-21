@@ -1,4 +1,3 @@
-require File.expand_path("~/.stripe/stripe.vpn/vpnmaker/vpnmaker")
 require 'csv'
 require 'openssl'
 
@@ -13,10 +12,6 @@ module Yoyo
     class DecredentialUser < Yoyo::StepList
       include DotStripeMixin
       include MinitrueMixin
-
-      def vpnmaker
-        @vpnmaker ||= VPNMaker::Manager.new(File.expand_path("~/.stripe/stripe.vpn/"))
-      end
 
       def contractor_ca_index
         CSV.parse(File.open(File.expand_path('~/.stripe/ca/data/index.txt')), col_sep: "\t")
@@ -131,25 +126,6 @@ module Yoyo
           run do
             Subprocess.check_call(%w{./bin/dot-git pull}, :cwd => dot_stripe, :env => useful_env)
             raise "It appears your ~/.stripe directory is dirty - please clean it up!" unless dot_stripe_clean?
-          end
-        end
-
-        step 'revoke VPN certificates for a full-time stripe' do
-          complete? do
-            # This user is not known as a fulltime person:
-            next true if (user = vpnmaker.tracker.users[mgr.username]).nil?
-
-            version = vpnmaker.tracker.active_key_version(mgr.username)
-            found = false
-            while version >= 0 && !found
-              next (found = true) unless vpnmaker.tracker.revoked?(mgr.username, version)
-              version -= 1
-            end
-            !found
-          end
-
-          run do
-            Subprocess.check_call(%W{./stripe.vpn/revoke-certs #{mgr.username}}, :cwd => dot_stripe, :env => useful_env)
           end
         end
 
