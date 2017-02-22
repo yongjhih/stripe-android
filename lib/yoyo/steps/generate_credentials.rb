@@ -311,9 +311,8 @@ EOM
           idempotent
 
           run do
-            user = SpaceCommander::Utils.get_stripe_username
-            hp_conn = SpaceCommander::SSH::Connection.new(user, 'hackpad1.northwest.stripe.io')
-            hp_conn.check_call! %W{sudo hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
+            hp = SpaceCommander::Server.new('hackpad1.northwest.stripe.io')
+            hp.ssh_cmd_check_call %W{sudo hackpad-mkuser #{stripe_email.name} #{stripe_email.local}}
           end
         end
 

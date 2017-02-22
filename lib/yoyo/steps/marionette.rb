@@ -52,14 +52,13 @@ module Yoyo; module Steps
         end
 
         run do
-          user = SpaceCommander::Utils.get_stripe_username
-          marionette_ssh = SpaceCommander::SSH::Connection.new(user, step_list.marionette_ssh)
+          marionette_server = SpaceCommander::Server.new(step_list.marionette_ssh)
 
           log.info("Cleaning up any residual puppet state...")
           mgr.ssh_root.call! %w{rm -rf /etc/puppet/ssl}
           begin
-            marionette_ssh.check_call! %W{sudo marionette-cert clean #{mgr.target_certname}}
-          rescue SpaceCommander::SSH::CommandError
+            marionette_server.ssh_cmd_check_call %W{sudo marionette-cert clean #{mgr.target_certname}}
+          rescue Subprocess::NonZeroExit
             # It's fine for the cleanup to fail if no cert exists under that name.
           end
 
@@ -71,7 +70,7 @@ module Yoyo; module Steps
           agent_cert = mgr.ssh_root.check_output!(
             %W{/usr/local/bin/puppet agent --test --fingerprint --digest sha256
                --certname #{mgr.target_certname}}).split.last
-          server_cert = marionette_ssh.check_output!(%W{
+          server_cert = marionette_server.ssh_cmd_check_output(%W{
             sudo marionette-cert list --digest sha256 #{mgr.target_certname}})
             .split.last.delete('()')
 
@@ -84,7 +83,7 @@ module Yoyo; module Steps
 
           log.info("Puppet cert #{agent_cert} matches")
 
-          marionette_ssh.check_call!(%W{sudo marionette-cert sign #{mgr.target_certname}})
+          marionette_server.ssh_cmd_check_call(%W{sudo marionette-cert sign #{mgr.target_certname}})
 
           mgr.ssh_root.check_call! %w{touch /etc/stripe/yoyo/marionette-auth}
         end
@@ -96,7 +95,7 @@ module Yoyo; module Steps
         end
 
         run do
-          out, err, status = mgr.ssh_root.exec!("cd /;" +
+          out, err, status = mgr.ssh_root.call_shell!("cd /;" +
             " unset TMPDIR;" +
             " /usr/local/bin/puppet agent --test --server '#{step_list.marionette_dns}'" +
             " --certname '#{mgr.target_certname}'")
