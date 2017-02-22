@@ -13,8 +13,7 @@ module Yoyo;
       include DotStripeMixin
       include MinitrueMixin
 
-      #LDAPMANAGER_HOSTS = ['ldapmanager.corp.stripe.com', 'ldapmanager.qa.corp.stripe.com']
-      LDAPMANAGER_HOSTS = ['ldapmanager.corp.stripe.com']
+      LDAPMANAGER_HOSTS = ['ldapmanager.corp.stripe.com', 'ldapmanager.qa.corp.stripe.com']
 
       def set_ssh_key(ssh_key)
         @ssh_key = ssh_key
