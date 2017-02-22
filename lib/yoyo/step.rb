@@ -36,8 +36,23 @@ module Yoyo
 
     def run_as_needed!
       if !idempotent? && complete?
+        Raven.breadcrumbs.record do |crumb|
+          crumb.data = {
+            skipped: true
+          }
+          crumb.message = "Skipped step #{@name}"
+          crumb.timestamp = Time.now.to_i
+        end
         log.info('already complete')
         return
+      end
+      Raven.breadcrumbs.record do |crumb|
+        crumb.data = {
+          skipped: false,
+          idempotent: idempotent?
+        }
+        crumb.message = "Running step #{@name}"
+        crumb.timestamp = Time.now.to_i
       end
       run!
     end
