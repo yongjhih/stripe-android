@@ -2,11 +2,12 @@
 
 require_relative '../lib/yoyo'
 require 'chalk-cli'
+require 'sentry-raven'
 
-class Spinup < Chalk::CLI::Command
+class Spinup < Yoyo::Command
   NECESSARY_GROUPS=%w{stripe}
 
-  def invoke
+  def do_invoke
     if arguments.length != 3
       usage
       return false
@@ -50,8 +51,8 @@ class Spinup < Chalk::CLI::Command
   App.action(self)
 end
 
-class Cleanup < Chalk::CLI::Command
-  def invoke
+class Cleanup < Yoyo::Command
+  def do_invoke
     command_name, ip_address, username = arguments
     mgr = Yoyo::Manager.new(ip_address, username)
     mgr.disable_ssh!
@@ -61,8 +62,8 @@ class Cleanup < Chalk::CLI::Command
   App.action(self)
 end
 
-class Decredential < Chalk::CLI::Command
-  def invoke
+class Decredential < Yoyo::Command
+  def do_invoke
     command_name, username = arguments
     mgr = Yoyo::Manager.new(nil, username)
     mgr.decredential_user!
@@ -72,8 +73,8 @@ class Decredential < Chalk::CLI::Command
   App.action(self)
 end
 
-class GPGSign < Chalk::CLI::Command
-  def invoke
+class GPGSign < Yoyo::Command
+  def do_invoke
     command_name, keyid = arguments
     args = {
       gpg_key: keyid,
@@ -91,8 +92,8 @@ class GPGSign < Chalk::CLI::Command
   App.action(self)
 end
 
-class GPGRevoke < Chalk::CLI::Command
-  def invoke
+class GPGRevoke < Yoyo::Command
+  def do_invoke
     command_name, keyid = arguments
     args = {
       gpg_key: keyid,
