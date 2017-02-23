@@ -11,6 +11,7 @@ require_relative 'yoyo/errors'
 require_relative 'yoyo/ssh'
 
 require_relative 'yoyo/dot_stripe_mixin'
+require_relative 'yoyo/ldapmanager_mixin'
 require_relative 'yoyo/minitrue_mixin'
 
 require_relative 'yoyo/step'
