@@ -157,6 +157,24 @@ module Yoyo
             Subprocess.check_call(%w{for-servers -Sayt vpn -t intfe stripe-puppet}, :env => useful_env)
           end
         end
+
+        LDAPMANAGER_HOSTS.each do |host|
+          step "Remove SSH keys and groups from ldapmanager (host: #{host})" do
+            complete? do
+              @user = get_user_from_ldapmanager(prod_host, mgr.username)
+              @user['pubkeys'].empty? && @user['groups'].empty?
+            end
+
+            run do
+              decred = @user.dup.update({
+                pubkeys: [],
+                groups: [],
+              })
+
+              resp = ldapmanager_conn(host).post(path: "/api/v1/users/#{mgr.username}", body: JSON.dump(decred))
+            end
+          end
+        end
       end
     end
   end
