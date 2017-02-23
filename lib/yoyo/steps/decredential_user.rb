@@ -162,7 +162,7 @@ module Yoyo
         LDAPMANAGER_HOSTS.each do |host|
           step "Remove SSH keys and groups from ldapmanager (host: #{host})" do
             complete? do
-              @user = get_user_from_ldapmanager(prod_host, mgr.username)
+              @user = get_user_from_ldapmanager(host, mgr.username)
               @user['public_keys'].empty? && @user['groups'].empty?
             end
 
