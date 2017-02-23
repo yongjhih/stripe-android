@@ -162,12 +162,12 @@ module Yoyo
           step "Remove SSH keys and groups from ldapmanager (host: #{host})" do
             complete? do
               @user = get_user_from_ldapmanager(prod_host, mgr.username)
-              @user['pubkeys'].empty? && @user['groups'].empty?
+              @user['public_keys'].empty? && @user['groups'].empty?
             end
 
             run do
               decred = @user.dup.update({
-                pubkeys: [],
+                public_keys: [],
                 groups: [],
               })
 
