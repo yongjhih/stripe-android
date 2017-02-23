@@ -11,6 +11,7 @@ module Yoyo;
   module Steps
     class GenerateCredentials < Yoyo::StepList
       include DotStripeMixin
+      include LdapManagerMixin
       include MinitrueMixin
 
       LDAPMANAGER_HOSTS = ['ldapmanager.corp.stripe.com', 'ldapmanager.qa.corp.stripe.com']
@@ -61,25 +62,6 @@ module Yoyo;
             secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
             Octokit::Client.new(:access_token => secret['auth_token'])
           end
-      end
-
-      def proxy_conn(host)
-        @conns ||= {}
-        @conns[host] ||= Excon.new("http://#{host}",
-                                   proxy: {scheme: 'unix', path: "#{ENV['HOME']}/.stripeproxy"},
-                                   persistent: true)
-      end
-
-      def user_exists_in_ldapmanager?(host)
-        resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
-
-        if resp.status == 200
-          true
-        elsif resp.status == 400
-          false
-        else
-          raise "Unexpected status from ldapmanager:\n#{resp.inspect}"
-        end
       end
 
       # Strip the final comment from the ssh key (this is how the
@@ -330,7 +312,7 @@ EOM
               groups: mgr.puppet_groups,
               pubkeys: [],
             }
-            resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
+            resp = ldapmanager_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
             raise "error creating user:\n#{resp.inspect}" if resp.status != 200
           end
         end
@@ -344,10 +326,7 @@ EOM
           end
 
           run do
-            resp = proxy_conn(prod_host).get(path: "/api/v1/users/#{stripe_email.local}")
-            raise "user should exist in prod:\n#{resp.inspect}" if resp.status != 200
-
-            unix_uid = JSON.load(resp.body)['uid']
+            unix_uid = get_user_from_ldapmanager(prod_host, stripe_email.local)['uid']
             raise "invalid uid: #{unix_uid.inspect}" unless unix_uid.is_a?(Integer)
 
             create_request = {
@@ -358,7 +337,7 @@ EOM
               groups: mgr.puppet_groups,
               pubkeys: [],
             }
-            resp = proxy_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
+            resp = ldapmanager_conn(host).post(path: '/api/v1/users', body: JSON.dump(create_request))
             raise "error creating user:\n#{resp.inspect}" if resp.status != 200
           end
         end
@@ -366,7 +345,7 @@ EOM
         LDAPMANAGER_HOSTS.each do |host|
           step "Add SSH key to LDAP using ldapmanager (host: #{host})" do
             complete? do
-              resp = proxy_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
+              resp = ldapmanager_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
 
               # We must have the user, since it gets created above.
               raise "User not found in ldapmanager" unless resp.status == 200
@@ -377,7 +356,7 @@ EOM
 
             run do
               body = {public_key: ssh_key}
-              resp = proxy_conn(host).post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
+              resp = ldapmanager_conn(host).post(path: "/api/v1/users/#{stripe_email.local}/ssh_keys", body: JSON.dump(body))
 
               # Note: this returns a 204 No Content
               raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 204
