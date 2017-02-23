@@ -11,6 +11,7 @@ module Yoyo
     # possible.
     class DecredentialUser < Yoyo::StepList
       include DotStripeMixin
+      include LdapManagerMixin
       include MinitrueMixin
 
       def contractor_ca_index
