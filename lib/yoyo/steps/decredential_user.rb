@@ -87,6 +87,24 @@ module Yoyo
           end
         end
 
+        LDAPMANAGER_HOSTS.each do |host|
+          step "Remove SSH keys and groups from ldapmanager (host: #{host})" do
+            complete? do
+              @user = get_user_from_ldapmanager(host, mgr.username)
+              @user['public_keys'].empty? && @user['groups'].empty?
+            end
+
+            run do
+              decred = @user.dup.update({
+                public_keys: [],
+                groups: [],
+              })
+
+              resp = ldapmanager_conn(host).post(path: "/api/v1/users/#{mgr.username}", body: JSON.dump(decred))
+            end
+          end
+        end
+
         step 'Revoke minitrue certs on all regions' do
           idempotent
 
@@ -156,24 +174,6 @@ module Yoyo
                                     :env => useful_env)
             end
             Subprocess.check_call(%w{for-servers -Sayt vpn -t intfe stripe-puppet}, :env => useful_env)
-          end
-        end
-
-        LDAPMANAGER_HOSTS.each do |host|
-          step "Remove SSH keys and groups from ldapmanager (host: #{host})" do
-            complete? do
-              @user = get_user_from_ldapmanager(host, mgr.username)
-              @user['public_keys'].empty? && @user['groups'].empty?
-            end
-
-            run do
-              decred = @user.dup.update({
-                public_keys: [],
-                groups: [],
-              })
-
-              resp = ldapmanager_conn(host).post(path: "/api/v1/users/#{mgr.username}", body: JSON.dump(decred))
-            end
           end
         end
       end
