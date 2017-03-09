@@ -64,6 +64,14 @@ module Yoyo;
           end
       end
 
+      def github_enterprise_client
+        @ghe_client ||=
+          begin
+            secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
+            Yoyo::GithubEnterpriseClient.new(secret['auth_token_ghe'])
+          end
+      end
+
       # Strip the final comment from the ssh key (this is how the
       # github API stores/returns it)
       def ssh_key_bare
@@ -235,14 +243,25 @@ EOM
           end
         end
 
-        step 'Add SSH key to github' do
+        step 'Add SSH key to github.com' do
           complete? do
-            keys = github_client.keys
-            keys.find { |key_entry| key_entry['key'] == ssh_key_bare }
+            gh_keys = github_client.keys
+            gh_keys.find { |key_entry| key_entry['key'] == ssh_key_bare }
           end
 
           run do
             github_client.add_key(stripe_email.local, ssh_key)
+          end
+        end
+
+        step 'Add SSH key to github enterprise' do
+          complete? do
+            ghe_keys = github_enterprise_client.keys
+            ghe_keys.find { |key_entry| key_entry['key'] == ssh_key_bare }
+          end
+
+          run do
+            github_enterprise_client.add_key(stripe_email.local, ssh_key)
           end
         end
 
@@ -280,11 +299,20 @@ EOM
           end
         end
 
-        step 'Remove SSH key from github' do
+        step 'Remove SSH key from github.com' do
           idempotent
 
           run do
             the_key = github_client.keys.find { |key| key['key'] == ssh_key_bare }
+            github_client.remove_key(the_key['id']) if the_key
+          end
+        end
+
+        step 'Remove SSH key from github enterprise' do
+          idempotent
+
+          run do
+            the_key = github_enterprise_client.keys.find { |key| key['key'] == ssh_key_bare }
             github_client.remove_key(the_key['id']) if the_key
           end
         end
