@@ -14,7 +14,7 @@ fi
 
 git clone "$root/${1}.git"
 cd "$1"
-git config remote.origin.url "git@github.com:stripe-internal/${1}.git"
+git config remote.origin.url "git@git.corp.stripe.com:stripe-internal/${1}.git"
 
 if [ "$1" == "space-commander" ]; then
   git config commit.gpgsign true
