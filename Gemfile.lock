@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:stripe-internal/space-commander
+  remote: git@git.corp.stripe.com:stripe-internal/space-commander
   revision: 1a0ad47420e2c4d6b8b4bc52a6bafb15955f8fd1
   ref: 1a0ad47420e2c4d6b8b4bc52a6bafb15955f8fd1
   specs:

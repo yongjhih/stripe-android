@@ -14,7 +14,7 @@ mkdir -p "$PREFIX"
 
 for repo in $(cat ./repos); do
     if ! [ -d "$PREFIX/$repo" ] ; then
-        git clone --mirror git@github.com:/stripe-internal/$repo "$PREFIX/$repo"
+        git clone --mirror git@git.corp.stripe.com:/stripe-internal/$repo "$PREFIX/$repo"
     fi
 done
 cp scripts/* "$PREFIX"
