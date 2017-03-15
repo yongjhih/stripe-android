@@ -8,8 +8,13 @@ class Yoyo::Command < Chalk::CLI::Command
     Raven.tags_context(cli_arguments: arguments)
     Raven.tags_context(cli_options: options)
 
-    Raven.capture do
+    begin
       do_invoke
+    rescue Interrupt
+      # Peaceful, just exit & don't report to sentry
+      raise
+    rescue Exception => e
+      Raven.capture_exception(e)
     end
   end
 
