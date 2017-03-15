@@ -137,6 +137,8 @@ GEM
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
       faraday (~> 0.8, < 1.0)
+    sentry-raven (2.3.0)
+      faraday (>= 0.7.6, < 1.0)
     sixword (0.3.0)
     slop (3.6.0)
     subprocess (1.3.3)
@@ -159,6 +161,7 @@ DEPENDENCIES
   pry-byebug
   rake
   rb-readline
+  sentry-raven
   space-commander!
   yoyo!
 
