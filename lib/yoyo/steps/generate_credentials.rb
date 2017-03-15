@@ -28,16 +28,24 @@ module Yoyo;
       attr_reader :client_certificate
 
       def gpg_fingerprint
-        output = mgr.ssh.check_output!(%W{gpg --list-secret-keys --no-tty --with-colons --fingerprint <#{stripe_email.address}>})
+      	while 1
+      	  begin
+            output = mgr.ssh.check_output!(%W{gpg --list-secret-keys --no-tty --with-colons --fingerprint <#{stripe_email.address}>})
+            break
+          rescue
+            log.info "No GPG key generated yet, sleeping for 30 seconds while puppet gets off it's butt..."
+            sleep 30
+          end
+        end
         output.split("\n").each do |line|
           abbrev, rest = line.split(':', 2)
           if abbrev == 'fpr'
             # fingerprint is in field 10; starting to count at 0, and
             # having stripped away the abbrev, this is index 8:
+            log.info "GPG Key found on [TARGET] :)"
             return rest.split(':')[8]
           end
         end
-        nil
       end
 
       def stripe_email
