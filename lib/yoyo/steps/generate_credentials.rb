@@ -337,7 +337,7 @@ EOM
         step "Add new user to LDAP using ldapmanager (prod)" do
           host = 'ldapmanager.corp.stripe.com'
           complete? do
-            user_exists_in_ldapmanager?(host)
+            user_exists_in_ldapmanager?(host, stripe_email.local)
           end
 
           run do
@@ -358,7 +358,7 @@ EOM
           prod_host = 'ldapmanager.corp.stripe.com'
 
           complete? do
-            user_exists_in_ldapmanager?(host)
+            user_exists_in_ldapmanager?(host, stripe_email.local)
           end
 
           run do
