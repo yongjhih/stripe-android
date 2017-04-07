@@ -25,7 +25,7 @@ module Yoyo
         step "Add new user to LDAP using ldapmanager (prod)" do
           host = 'ldapmanager.corp.stripe.com'
           complete? do
-            user_exists_in_ldapmanager?(host, username)
+            user_exists_in_ldapmanager?(host)
           end
 
           run do
@@ -46,7 +46,7 @@ module Yoyo
           prod_host = 'ldapmanager.corp.stripe.com'
 
           complete? do
-            user_exists_in_ldapmanager?(host, username)
+            user_exists_in_ldapmanager?(host)
           end
 
           run do
