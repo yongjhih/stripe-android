@@ -7,23 +7,18 @@ module Yoyo
     class AddVendor < Yoyo::StepList
       include LdapManagerMixin
 
-      def username
-        @username ||= begin
-                        uname = mgr.username
-                        if !uname.end_with?('-fcr') && !uname.end_with?('-voxpro')
-                          raise "Invalid vendor username; must end with '-fcr' or '-voxpro'"
-                        end
+      attr_reader :username, :full_name
 
-                        uname
-                      end
-      end
+      def initialize(manager)
+        super
 
-      def full_name
-        @full_name ||= begin
-                         fname = mgr.full_name
-                         raise "Must provide a full name" if fname.empty?
-                         fname
-                       end
+        @username = mgr.username
+        if !@username.end_with?('-fcr') && !@username.end_with?('-voxpro')
+          raise "Invalid vendor username; must end with '-fcr' or '-voxpro'"
+        end
+
+        @full_name = mgr.full_name
+        raise "Must provide a full name" if @full_name.empty?
       end
 
       def init_steps

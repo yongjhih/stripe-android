@@ -113,11 +113,11 @@ end
 
 class AddVendor < Yoyo::Command
   def do_invoke
+    command_name, username, full_name = arguments
     args = {
-      username: arguments[0],
-      full_name: arguments[1],
+      full_name: full_name,
     }
-    mgr = Yoyo::Manager.new(nil, nil, args)
+    mgr = Yoyo::Manager.new(nil, username, args)
     mgr.add_vendor!
   end
 
