@@ -4,7 +4,7 @@ require 'openssl'
 module Yoyo
   module Steps
     # Steps to add a new vendor user
-    class DecredentialUser < Yoyo::StepList
+    class AddVendor < Yoyo::StepList
       include LdapManagerMixin
 
       def username

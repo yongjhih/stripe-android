@@ -160,6 +160,8 @@ def parse_args(args)
     GPGSign::App.run_if_invoked(__FILE__)
   when 'gpg-revoke'
     GPGRevoke::App.run_if_invoked(__FILE__)
+  when 'add-vendor'
+    AddVendor::App.run_if_invoked(__FILE__)
   else
     return usage
   end
