@@ -111,6 +111,23 @@ class GPGRevoke < Yoyo::Command
   App.action(self)
 end
 
+class AddVendor < Yoyo::Command
+  def do_invoke
+    command_name, username, full_name = arguments
+    args = {
+      full_name: full_name,
+    }
+    mgr = Yoyo::Manager.new(nil, username, args)
+    mgr.add_vendor!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} add-vendor username "Full Name"')
+  App.options do |opts|
+    # No options yet!
+  end
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -124,6 +141,8 @@ Commands:
     decredential USERNAME
 
     gpg-sign KEYID
+
+    add-vendor USERNAME "FULL NAME"
 
     EOM
   return 1
@@ -141,6 +160,8 @@ def parse_args(args)
     GPGSign::App.run_if_invoked(__FILE__)
   when 'gpg-revoke'
     GPGRevoke::App.run_if_invoked(__FILE__)
+  when 'add-vendor'
+    AddVendor::App.run_if_invoked(__FILE__)
   else
     return usage
   end

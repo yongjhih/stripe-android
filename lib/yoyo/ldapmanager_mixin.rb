@@ -12,7 +12,8 @@ module Yoyo
     end
 
     def user_exists_in_ldapmanager?(host)
-      resp = ldapmanager_conn(host).get(path: "/api/v1/users/#{stripe_email.local}")
+      username = mgr.stripe_username || mgr.username
+      resp = ldapmanager_conn(host).get(path: "/api/v1/users/#{username}")
 
       if resp.status == 200
         true

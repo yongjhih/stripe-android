@@ -3,7 +3,7 @@ require 'space-commander'
 
 module Yoyo
   class Manager
-    attr_reader :ip_address, :username, :stripe_username, :puppet_groups, :machine_number
+    attr_reader :ip_address, :username, :full_name, :stripe_username, :puppet_groups, :machine_number
     attr_reader :gpg_signing_identities
     attr_reader :puppet_server, :puppet_endpoint
     attr_accessor :gpg_key
@@ -11,6 +11,7 @@ module Yoyo
     def initialize(ip_address, username, options={})
       @ip_address = ip_address
       @username = username
+      @full_name = options[:full_name]
       @stripe_username = options[:stripe_user]
       @skip_certs = true if options[:no_certs]
       @gpg_key = options[:gpg_key]
@@ -67,6 +68,13 @@ module Yoyo
       log.info("Starting GPG revocation process")
       run_steps([
                   Yoyo::Steps::GPGRevoke
+                ])
+    end
+
+    def add_vendor!
+      log.info("Starting add_vendor!")
+      run_steps([
+                  Yoyo::Steps::AddVendor
                 ])
     end
 
