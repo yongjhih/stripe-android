@@ -37,7 +37,7 @@ module Yoyo
 
         step 'Revoke the CA signature with gpg' do
           complete? do
-            revokers = Subprocess.check_output(gpg(%W{--list-keys --with-colons #{mgr.gpg_key}}), cwd: ramdisk_path).split("\n").grep(/\Arkv:/)
+            revokers = Subprocess.check_output(gpg(%W{--list-keys --with-colons #{mgr.gpg_key}}), cwd: ramdisk_path).split("\n").grep(/\Arvk:/)
 
             # Can't automatically revoke with any other CA at the
             # moment, or keys that don't have the CA identity as a
