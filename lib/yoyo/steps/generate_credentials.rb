@@ -320,8 +320,31 @@ EOM
           idempotent
 
           run do
+            num_keys_before = github_enterprise_client.keys.length
+            if num_keys_before < 1
+              Raven.capture_message(
+                "Didn't find any SSH keys registered on 'stripe-credentialing' on GitHub Enterprise!",
+                tags: {'ghe_action' => 'no keys added'})
+            end
             the_key = github_enterprise_client.keys.find { |key| key['key'] == ssh_key_bare }
-            github_client.remove_key(the_key['id']) if the_key
+            if the_key
+              # Only log the first 25 chars of the public key
+              the_key['key'] = the_key['key'][0..25]
+              Raven.breadcrumbs.record do |crumb|
+                crumb.data = the_key
+                crumb.message = "Found SSH key with ID #{the_key['id']}"
+                crumb.timestamp = Time.now.to_i
+              end
+
+              github_client.remove_key(the_key['id'])
+              if github_enterprise_client.keys.length != num_keys_before - 1
+                Raven.capture_message("Wasn't able to delete SSH key from 'stripe-credentialing' on GitHub Enterprise!",
+                  extra: {'id' => the_key['id'], 'ssh_key' => the_key['key'][0..25]},
+                  tags: {'ghe_action' => 'remove key fail'})
+              end
+            else
+              Raven.capture_message("Unable to find key on GitHub Enterprise!", extra: {'ssh_key' => ssh_key_bare[0..25]})
+            end
           end
         end
 

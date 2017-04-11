@@ -1,5 +1,6 @@
 require 'excon'
 require 'json'
+require 'sentry-raven'
 
 module Yoyo
   # Class that contains helper methods for interacting with GitHub Enterprise.
@@ -74,9 +75,27 @@ module Yoyo
         )
       end
 
-      if resp.status < 200 || resp.status > 299
-        raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to path '#{path}'."
+      Raven.breadcrumbs.record do |crumb|
+        crumb.data = { response_env: resp }
+        crumb.category = "excon"
+        crumb.timestamp = Time.now.to_i
+        crumb.message = "Completed #{method.to_s.upcase} request to #{ghe_client.connection_uri}/#{path}"
       end
+
+      # FIXME(areitz): potentially remove this debug code when we figure out what's going on.
+      if method == :delete && resp.status != 204
+        Raven.capture_message("Performed a DELETE action and didn't get a 204 back. Instead, got #{resp.status}")
+      end
+
+      begin
+        if resp.status < 200 || resp.status > 299
+          raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to path '#{path}'."
+        end
+      rescue => e
+        Raven.capture_exception(e)
+        $stderr.puts e.message
+      end
+
       JSON.parse(resp.body) if resp.body.length > 0
     end
   end
