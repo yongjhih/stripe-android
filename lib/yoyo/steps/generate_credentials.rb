@@ -336,7 +336,7 @@ EOM
                 crumb.timestamp = Time.now.to_i
               end
 
-              github_client.remove_key(the_key['id'])
+              github_enterprise_client.remove_key(the_key['id'])
               if github_enterprise_client.keys.length != num_keys_before - 1
                 Raven.capture_message("Wasn't able to delete SSH key from 'stripe-credentialing' on GitHub Enterprise!",
                   extra: {'id' => the_key['id'], 'ssh_key' => the_key['key'][0..25]},
