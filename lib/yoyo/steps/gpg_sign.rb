@@ -23,7 +23,7 @@ module Yoyo
           run do
             mgr.gpg_signing_identities.each do |identity|
               fpr = signing_identities[identity]
-              passphrase = Bundler.with_clean_env {Subprocess.check_output(%W{fetch-password gnupg/#{identity}/passphrase}).chomp}
+              passphrase = Bundler.with_clean_env {Subprocess.check_output(%W{fetch-password gnupg/#{identity}/passphrase}, env: useful_env).chomp}
               pp_in, pp_out = IO.pipe
               gpg = Subprocess.popen(gpg(%W{--default-key #{fpr}
                                             --passphrase-fd #{pp_in.fileno}
