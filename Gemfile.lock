@@ -18,7 +18,7 @@ GIT
       thor
 
 GIT
-  remote: git@github.com:stripe/chalk-hostname
+  remote: git@git.corp.stripe.com:stripe-internal/chalk-hostname
   revision: c362f40046d2a1188bca11c969611a4bca1b9c37
   ref: c362f40046d2a1188bca11c969611a4bca1b9c37
   specs:
