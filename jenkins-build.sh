@@ -4,7 +4,7 @@
 cd /src
 stripe-deps-ruby
 stripe-build-ruby
-#stripe-package-ruby
+stripe-package-ruby
 
 cd /build
 stripe-test-ruby

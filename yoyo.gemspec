@@ -16,7 +16,17 @@ Gem::Specification.new do |spec|
   spec.license       = "Proprietary"
 
   spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  # This is a gross hack -- it grabs all files under bin (even if under nested
+  # directories), and retruns the list with `bin` stripped off.
+  spec.executables   = spec.files.grep(%r{^bin/}) do |full_path|
+    path_parts = full_path.split('/')
+    bin_idx = path_parts.index("bin")
+    bin_idx += 1
+    end_idx = path_parts.length
+    new_parts = path_parts[bin_idx..end_idx]
+    new_parts.join('/')
+  end
+
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
