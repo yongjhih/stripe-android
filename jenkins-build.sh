@@ -3,7 +3,7 @@
 
 cd /src
 stripe-deps-ruby
-#stripe-build-ruby
+stripe-build-ruby
 #stripe-package-ruby
 
 cd /build
