@@ -43,6 +43,10 @@ module Yoyo
       paginate("orgs/#{org}/teams")
     end
 
+    def organization_member?(org, user)
+      boolean_get("orgs/#{org}/members/#{user}")
+    end
+
     def add_team_membership(team_id, username)
       put("teams/#{team_id}/memberships/#{username}")
     end
@@ -58,11 +62,26 @@ module Yoyo
     end
 
     def delete(resource)
-      json_excon_op(:delete, resource)
+      resp = excon_op(:delete, resource)
+
+      if resp.status != 204
+        msg = "Performed a DELETE action against resource '#{resource}' and didn't get a 204 back. Instead, got a #{resp.status}."
+        $stderr.puts "WARN: #{msg}"
+        Raven.capture_message(msg)
+        return false
+      end
+
+      true
     end
 
     def get(resource)
       json_excon_op(:get, resource)
+    end
+
+    # These calls return a 204 if the resource is valid, 404 if invalid.
+    def boolean_get(resource)
+      resp = excon_op(:get, resource)
+      resp.status == 204
     end
 
     def put(resource)
@@ -75,10 +94,22 @@ module Yoyo
 
     # Perform an excon operation, and return the HTTP body as an JSON object.
     def json_excon_op(method, resource, body=nil)
-      resp = excon_op(method, resource, body=nil)
+      resp = excon_op(method, resource, body)
+
+      begin
+        if resp.status < 200 || resp.status > 299
+          raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to resource '#{resource}'."
+        end
+      rescue => e
+        Raven.capture_exception(e)
+        $stderr.puts e.message
+      end
+
       JSON.parse(resp.body) if resp.body.length > 0
     end
 
+    # Perform an excon operation that supports pagination, and gets all of the
+    # results for a resource.
     def paginate_excon_op(method, resource, body=nil)
       # Get the first page.
       resp = excon_op(method, resource)
@@ -98,7 +129,7 @@ module Yoyo
       body
     end
 
-    # Perform an Excon operation.
+    # Perform an Excon operation against a resource, returns the excon response object.
     def excon_op(method, resource, body=nil)
       path = "/api/v3/#{resource}"
       headers = {
@@ -126,20 +157,6 @@ module Yoyo
         crumb.category = "excon"
         crumb.timestamp = Time.now.to_i
         crumb.message = "Completed #{method.to_s.upcase} request to #{ghe_client.connection_uri}/#{path}"
-      end
-
-      # FIXME(areitz): potentially remove this debug code when we figure out what's going on.
-      if method == :delete && resp.status != 204
-        Raven.capture_message("Performed a DELETE action and didn't get a 204 back. Instead, got #{resp.status}")
-      end
-
-      begin
-        if resp.status < 200 || resp.status > 299
-          raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to path '#{path}'."
-        end
-      rescue => e
-        Raven.capture_exception(e)
-        $stderr.puts e.message
       end
 
       resp

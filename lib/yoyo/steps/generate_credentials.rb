@@ -425,20 +425,22 @@ EOM
 
         step "Add user to GitHub Enterprise" do
           complete? do
+            github_enterprise_client.organization_member?('stripe-internal', mgr.stripe_username || mgr.username)
           end
 
           run do
             stripe_username = mgr.stripe_username || mgr.username
             teams = github_enterprise_client.organization_teams('stripe-internal')
-            stripe_ro_team = teams.find { |t| t["name"] == 'stripes-ro' }
-            stripe_rw_team = teams.find { |t| t["name"] == 'stripes-rw' }
-            status = github_enterprise_client.create_user(stripe_username, email)
+            stripe_ro_team = teams.find { |t| t['name'] == 'stripes-ro' }
+            stripe_rw_team = teams.find { |t| t['name'] == 'stripes-rw' }
+            github_enterprise_client.create_user(stripe_username, email)
+
             if mgr.groups.include('eng')
-              team_id = stripe_rw_team[:id]
+              team_id = stripe_rw_team['id']
             else
-              team_id = stripe_ro_team[:id]
+              team_id = stripe_ro_team['id']
             end
-            status = github_enterprise_client.add_team_membership(team_id, stripe_username)
+            github_enterprise_client.add_team_membership(team_id, stripe_username)
           end
         end
       end
