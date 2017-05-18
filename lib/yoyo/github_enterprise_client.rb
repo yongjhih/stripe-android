@@ -39,17 +39,63 @@ module Yoyo
       delete("user/keys/#{id}")
     end
 
+    def organization_teams(org)
+      paginate("orgs/#{org}/teams")
+    end
+
+    def add_team_membership(team_id, username)
+      put("teams/#{team_id}/memberships/#{username}")
+    end
+
+    # Admin API
+    def create_user(username, email)
+      post('admin/users', {:login => username, :email => email})
+    end
+
     private
     def post(resource, params)
-      excon_op(:post, resource, params)
+      json_excon_op(:post, resource, params)
     end
 
     def delete(resource)
-      excon_op(:delete, resource)
+      json_excon_op(:delete, resource)
     end
 
     def get(resource)
-      excon_op(:get, resource)
+      json_excon_op(:get, resource)
+    end
+
+    def put(resource)
+      json_excon_op(:put, resource)
+    end
+
+    def paginate(resource)
+      paginate_excon_op(:get, resource)
+    end
+
+    # Perform an excon operation, and return the HTTP body as an JSON object.
+    def json_excon_op(method, resource, body=nil)
+      resp = excon_op(method, resource, body=nil)
+      JSON.parse(resp.body) if resp.body.length > 0
+    end
+
+    def paginate_excon_op(method, resource, body=nil)
+      # Get the first page.
+      resp = excon_op(method, resource)
+      body = []
+      if resp.body.length > 0
+        body.concat(JSON.parse(resp.body))
+      end
+
+      # Dig out the "Link" header, and extract the `?page=2` part. If we can't
+      # extract it, then there are no more pages, and we should stop.
+      while resp.headers.fetch("Link", "") =~ /(\?[^>]+)>; rel="next"/
+        resp = excon_op(method, "#{resource}#{$1}")
+        if resp.body.length > 0
+          body.concat(JSON.parse(resp.body))
+        end
+      end
+      body
     end
 
     # Perform an Excon operation.
@@ -96,7 +142,7 @@ module Yoyo
         $stderr.puts e.message
       end
 
-      JSON.parse(resp.body) if resp.body.length > 0
+      resp
     end
   end
 end

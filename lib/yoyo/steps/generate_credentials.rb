@@ -73,7 +73,7 @@ module Yoyo;
       end
 
       def github_enterprise_client
-        @ghe_client ||=
+        @github_enterprise_client ||=
           begin
             secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
             Yoyo::GithubEnterpriseClient.new(secret['auth_token_ghe'])
@@ -420,6 +420,25 @@ EOM
               # Note: this returns a 204 No Content
               raise "error adding SSH key:\n#{resp.inspect}" if resp.status != 204
             end
+          end
+        end
+
+        step "Add user to GitHub Enterprise" do
+          complete? do
+          end
+
+          run do
+            stripe_username = mgr.stripe_username || mgr.username
+            teams = github_enterprise_client.organization_teams('stripe-internal')
+            stripe_ro_team = teams.find { |t| t["name"] == 'stripes-ro' }
+            stripe_rw_team = teams.find { |t| t["name"] == 'stripes-rw' }
+            status = github_enterprise_client.create_user(stripe_username, email)
+            if mgr.groups.include('eng')
+              team_id = stripe_rw_team[:id]
+            else
+              team_id = stripe_ro_team[:id]
+            end
+            status = github_enterprise_client.add_team_membership(team_id, stripe_username)
           end
         end
       end
