@@ -45,4 +45,7 @@ Gem::Specification.new do |spec|
 
   # TEMP -> move this to s-c
   spec.add_dependency 'u2f_client', '~> 0.1'
+
+  # Space-commander brings an old version of this along for some reason.
+  spec.add_dependency 'chalk-tools', '~> 0.0.55'
 end
