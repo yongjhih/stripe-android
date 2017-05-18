@@ -433,7 +433,12 @@ EOM
             teams = github_enterprise_client.organization_teams('stripe-internal')
             stripe_ro_team = teams.find { |t| t['name'] == 'stripes-ro' }
             stripe_rw_team = teams.find { |t| t['name'] == 'stripes-rw' }
-            github_enterprise_client.create_user(stripe_username, email)
+            resp = github_enterprise_client.create_user(stripe_username, email)
+            if resp["type"] != "User"
+              msg = "ERROR: Unable to create user #{stripe_username} on GitHub Enterprise. Please reach out to #leverage!"
+              $stderr.puts msg
+              Raven.capture_message("#{msg} #{resp}")
+            end
 
             if mgr.groups.include('eng')
               team_id = stripe_rw_team['id']
