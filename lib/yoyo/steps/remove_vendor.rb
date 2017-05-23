@@ -1,6 +1,3 @@
-require 'csv'
-require 'openssl'
-
 module Yoyo
   module Steps
     # Remove a vendor
@@ -40,4 +37,3 @@ module Yoyo
     end
   end
 end
-

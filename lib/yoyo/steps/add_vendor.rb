@@ -1,6 +1,3 @@
-require 'csv'
-require 'openssl'
-
 module Yoyo
   module Steps
     # Steps to add a new vendor user
