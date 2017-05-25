@@ -1,6 +1,3 @@
-require 'csv'
-require 'openssl'
-
 module Yoyo
   module Steps
     # Steps to add a new vendor user
@@ -13,7 +10,7 @@ module Yoyo
         super
 
         @username = mgr.username
-        if !@username.end_with?('-fcr') && !@username.end_with?('-voxpro')
+        if !Yoyo::Vendor::is_vendor?(@username)
           raise "Invalid vendor username; must end with '-fcr' or '-voxpro'"
         end
 

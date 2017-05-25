@@ -78,6 +78,13 @@ module Yoyo
                 ])
     end
 
+    def remove_vendor!
+      log.info("Starting remove_vendor!")
+      run_steps([
+                  Yoyo::Steps::RemoveVendor
+                ])
+    end
+
     def target_serial
       @target_serial ||= get_target_serial
     end
