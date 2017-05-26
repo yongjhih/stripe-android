@@ -22,3 +22,4 @@ require_relative 'yoyo/manager'
 require_relative 'yoyo/steps'
 
 require_relative 'yoyo/gpg_verifier'
+require_relative 'yoyo/vendor'

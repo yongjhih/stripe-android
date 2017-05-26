@@ -128,6 +128,20 @@ class AddVendor < Yoyo::Command
   App.action(self)
 end
 
+class RemoveVendor < Yoyo::Command
+  def do_invoke
+    command_name, username = arguments
+    mgr = Yoyo::Manager.new(nil, username, {})
+    mgr.remove_vendor!
+  end
+
+  App = Chalk::CLI::App.new('Usage: #{$0} add-vendor username "Full Name"')
+  App.options do |opts|
+    # No options yet!
+  end
+  App.action(self)
+end
+
 def usage
   $stderr.puts <<-EOM
 usage: #{File.basename($0)} COMMAND [ARGS...]
@@ -143,6 +157,8 @@ Commands:
     gpg-sign KEYID
 
     add-vendor USERNAME "FULL NAME"
+
+    remove-vendor USERNAME
 
     EOM
   return 1
@@ -162,6 +178,8 @@ def parse_args(args)
     GPGRevoke::App.run_if_invoked(__FILE__)
   when 'add-vendor'
     AddVendor::App.run_if_invoked(__FILE__)
+  when 'remove-vendor'
+    RemoveVendor::App.run_if_invoked(__FILE__)
   else
     return usage
   end
