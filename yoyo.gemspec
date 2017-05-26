@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.files         = `git ls-files`.split($/)
   # This is a gross hack -- it grabs all files under bin (even if under nested
-  # directories), and retruns the list with `bin` stripped off.
+  # directories), and returns the list with `bin` stripped off.
   spec.executables   = spec.files.grep(%r{^bin/}) do |full_path|
     path_parts = full_path.split('/')
     bin_idx = path_parts.index("bin")
