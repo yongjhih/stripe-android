@@ -72,11 +72,23 @@ module Yoyo;
           end
       end
 
+      # This client is tied to the `stripe-credentialing` account, and can
+      # add/remove SSH keys to that account.
       def github_enterprise_client
         @github_enterprise_client ||=
           begin
             secret = YAML.load_file(File.expand_path('~/.stripe/github/yoyo.yaml'))
             Yoyo::GithubEnterpriseClient.new(secret['auth_token_ghe'])
+          end
+      end
+
+      # This client uses a high-strength token that has admin rights in the
+      # `stripe-internal` org.
+      def github_enterprise_admin_client
+        @github_enterprise_admin_client ||=
+          begin
+            secret = Subprocess.check_output(%w{fetch-password -q yoyo/github-enterprise/onboarding-api-token.gpg}).chomp
+            Yoyo::GithubEnterpriseClient.new(secret)
           end
       end
 
@@ -425,27 +437,35 @@ EOM
 
         step "Add user to GitHub Enterprise" do
           complete? do
-            github_enterprise_client.organization_member?('stripe-internal', mgr.stripe_username || mgr.username)
+            stripe_username = mgr.stripe_username || mgr.username
+            ret = github_enterprise_admin_client.organization_member?('stripe-internal', stripe_username)
+            Raven.breadcrumbs.record do |crumb|
+              crumb.data = { return_value: ret, stripe_username: stripe_username }
+              crumb.category = "add_user_to_ghe"
+              crumb.timestamp = Time.now.to_i
+              crumb.message = "`completed?` for step 'Add user to GitHub Enterprise'"
+            end
+            ret
           end
 
           run do
             stripe_username = mgr.stripe_username || mgr.username
-            teams = github_enterprise_client.organization_teams('stripe-internal')
+            teams = github_enterprise_admin_client.organization_teams('stripe-internal')
             stripe_ro_team = teams.find { |t| t['name'] == 'stripes-ro' }
             stripe_rw_team = teams.find { |t| t['name'] == 'stripes-rw' }
-            resp = github_enterprise_client.create_user(stripe_username, email)
+            resp = github_enterprise_admin_client.create_user(stripe_username, email)
             if resp["type"] != "User"
               msg = "ERROR: Unable to create user #{stripe_username} on GitHub Enterprise. Please reach out to #leverage!"
               $stderr.puts msg
               Raven.capture_message("#{msg} #{resp}")
-            end
-
-            if mgr.groups.include('eng')
-              team_id = stripe_rw_team['id']
             else
-              team_id = stripe_ro_team['id']
+              if mgr.groups.include('eng')
+                team_id = stripe_rw_team['id']
+              else
+                team_id = stripe_ro_team['id']
+              end
+              github_enterprise_admin_client.add_team_membership(team_id, stripe_username)
             end
-            github_enterprise_client.add_team_membership(team_id, stripe_username)
           end
         end
       end

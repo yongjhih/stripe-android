@@ -41,12 +41,12 @@ module Critic
         assert_equal(sample_title, resp[0]['title'], "Title mis-match error")
       end
 
-      it "removes successfully removes a valid key" do
-        Excon.stub({:method => :delete, :url => ghe_url('user/keys/71')}, {:body => nil, :status => 204})
+      it "successfully removes a valid key" do
+        Excon.stub({:method => :delete, :url => ghe_url('user/keys/71')}, {:body => "", :status => 204})
         assert(@ghe_client.remove_key(71), "Error removing key")
       end
 
-      it "removes successfully removes an invalid key" do
+      it "fails removing an invalid key" do
         Excon.stub({:method => :delete, :url => ghe_url('user/keys/71')}, {:body => nil, :status => 404})
         refute(@ghe_client.remove_key(71), "Error removing key")
       end

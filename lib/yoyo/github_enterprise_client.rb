@@ -80,7 +80,7 @@ module Yoyo
 
     # These calls return a 204 if the resource is valid, 404 if invalid.
     def boolean_get(resource)
-      resp = excon_op(:get, resource)
+      resp = excon_op_without_error_checking(:get, resource)
       resp.status == 204
     end
 
@@ -96,15 +96,6 @@ module Yoyo
     def json_excon_op(method, resource, body=nil)
       resp = excon_op(method, resource, body)
 
-      begin
-        if resp.status < 200 || resp.status > 299
-          raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to resource '#{resource}'."
-        end
-      rescue => e
-        Raven.capture_exception(e)
-        $stderr.puts e.message
-      end
-
       JSON.parse(resp.body) if resp.body.length > 0
     end
 
@@ -113,9 +104,17 @@ module Yoyo
     def paginate_excon_op(method, resource, body=nil)
       # Get the first page.
       resp = excon_op(method, resource)
+
       body = []
       if resp.body.length > 0
-        body.concat(JSON.parse(resp.body))
+        body_obj = JSON.parse(resp.body)
+        if body_obj.is_a?(Array)
+          body.concat(body_obj)
+        elsif body_obj.is_a?(Hash)
+          body << body_obj
+        else
+          raise "Unknown object type #{body_obj.class} encountered!"
+        end
       end
 
       # Dig out the "Link" header, and extract the `?page=2` part. If we can't
@@ -129,8 +128,34 @@ module Yoyo
       body
     end
 
-    # Perform an Excon operation against a resource, returns the excon response object.
+    # Perform an Excon operation against a resource, returns the excon response
+    # object. If the response indicates an error condition, data is logged to
+    # Sentry and an error message is printed to `stderr` (but the response
+    # object is still returned).
     def excon_op(method, resource, body=nil)
+      resp = excon_op_without_error_checking(method, resource, body)
+
+      begin
+        if resp.status < 200 || resp.status > 299
+          raise "ERROR: Got #{resp.status} from GitHub Enterprise for #{method} to resource '#{resource}'."
+        end
+      rescue => e
+        if resp.body && resp.body.length > 0
+          message_from_github = JSON.parse(resp.body)
+        else
+          message_from_github = "Unknown"
+        end
+        Raven.capture_exception(e, extra: {message_from_github: message_from_github})
+        $stderr.puts e.message
+        $stderr.puts "Message from GHE:", message_from_github
+      end
+
+      resp
+    end
+
+    # Perform an Excon operation against a resource, returns the excon response
+    # object. This method doesn't check the response for any error conditions.
+    def excon_op_without_error_checking(method, resource, body=nil)
       path = "/api/v3/#{resource}"
       headers = {
         'Accept' => 'application/vnd.github.v3+json',
@@ -153,7 +178,8 @@ module Yoyo
       end
 
       Raven.breadcrumbs.record do |crumb|
-        crumb.data = { response_env: resp }
+        crumb.data = { response_status: resp.status }
+        crumb.data[:response_body_length] = resp.body.length if resp.body
         crumb.category = "excon"
         crumb.timestamp = Time.now.to_i
         crumb.message = "Completed #{method.to_s.upcase} request to #{ghe_client.connection_uri}/#{path}"
