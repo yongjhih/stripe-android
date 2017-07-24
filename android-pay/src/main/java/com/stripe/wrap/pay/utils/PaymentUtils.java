@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
@@ -282,6 +283,12 @@ public class PaymentUtils {
             return "";
         }
 
+        // Override the default locale's grouping and decimal separator to conform to the
+        // Android Pay standard.
+        DecimalFormatSymbols symbolOverride = new DecimalFormatSymbols();
+        symbolOverride.setGroupingSeparator(',');
+        symbolOverride.setDecimalSeparator('.');
+
         int fractionDigits = currency.getDefaultFractionDigits();
         int totalLength = String.valueOf(price).length();
         StringBuilder builder = new StringBuilder();
@@ -290,8 +297,9 @@ public class PaymentUtils {
             for (int i = 0; i < totalLength; i++) {
                 builder.append('#');
             }
-            DecimalFormat noDecimalCurrencyFormat = new DecimalFormat(builder.toString());
+            DecimalFormat noDecimalCurrencyFormat = new DecimalFormat(builder.toString(), symbolOverride);
             noDecimalCurrencyFormat.setCurrency(currency);
+            noDecimalCurrencyFormat.setGroupingUsed(false);
             return noDecimalCurrencyFormat.format(price);
         }
 
@@ -311,9 +319,9 @@ public class PaymentUtils {
         double modBreak = Math.pow(10, fractionDigits);
         double decimalPrice = price / modBreak;
 
-        DecimalFormat decimalFormat = new DecimalFormat(builder.toString());
+        DecimalFormat decimalFormat = new DecimalFormat(builder.toString(), symbolOverride);
         decimalFormat.setCurrency(currency);
-
+        decimalFormat.setGroupingUsed(false);
         return decimalFormat.format(decimalPrice);
     }
 
