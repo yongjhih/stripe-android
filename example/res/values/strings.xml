@@ -37,6 +37,7 @@
     <string name="verify">Verify</string>
     <string name="updatedSources">Source results</string>
     <string name="updatedShippingInfo">Shipping detail results</string>
+    <string name="launch_focus_demo">Launch Focus Demo</string>
 
     <string name="cvc">CVC</string>
     <string name="payment_session_select_payment">Select Payment Method</string>

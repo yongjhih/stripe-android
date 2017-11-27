@@ -84,6 +84,14 @@
             android:layout_margin="10dp"
             android:text="@string/launch_pay_with_google"
             />
+        <Button
+            android:id="@+id/btn_focus_demo"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:text="@string/launch_focus_demo"
+            />
 
     </LinearLayout>
 

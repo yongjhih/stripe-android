@@ -78,6 +78,15 @@ public class LauncherActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button focusDemoButton = findViewById(R.id.btn_focus_demo);
+        focusDemoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LauncherActivity.this, FocusDemoActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 }
