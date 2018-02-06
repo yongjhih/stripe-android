@@ -49,7 +49,7 @@ public class ExampleEphemeralKeyProvider implements EphemeralKeyProvider {
         map.put("amount", "123");
         map.put("source", paymentToken);
         map.put("customer_id", customer.getId());
-        map.put("shipping", data.getShippingMethod().getIdentifier());
+        //map.put("shipping", data.getShippingMethod().getIdentifier());
         mCompositeSubscription.add(
                 mStripeService.customerCharge(map)
                         .subscribeOn(Schedulers.io())
