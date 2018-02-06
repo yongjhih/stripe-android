@@ -5,6 +5,8 @@ import android.support.annotation.Size;
 
 import com.stripe.android.EphemeralKeyProvider;
 import com.stripe.android.EphemeralKeyUpdateListener;
+import com.stripe.android.PaymentSessionData;
+import com.stripe.android.model.Customer;
 import com.stripe.example.module.RetrofitFactory;
 
 import java.io.IOException;
@@ -33,6 +35,66 @@ public class ExampleEphemeralKeyProvider implements EphemeralKeyProvider {
         mStripeService = retrofit.create(StripeService.class);
         mCompositeSubscription = new CompositeSubscription();
         mProgressListener = progressListener;
+    }
+
+
+    public StripeService stripeService() {
+        return mStripeService;
+    }
+
+    public void customerCharge(@NonNull final PaymentSessionData data, @NonNull final Customer customer) {
+        final String paymentToken = data.getSelectedPaymentMethodId();
+        final Map<String, String> map = new HashMap<>();
+        System.out.println("yo: " + paymentToken);
+        map.put("amount", "123");
+        map.put("source", paymentToken);
+        map.put("customer_id", customer.getId());
+        map.put("shipping", data.getShippingMethod().getIdentifier());
+        mCompositeSubscription.add(
+                mStripeService.customerCharge(map)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<ResponseBody>() {
+                            @Override
+                            public void call(ResponseBody response) {
+                                try {
+                                    String rawKey = response.string();
+                                    mProgressListener.onStringResponse(rawKey);
+                                } catch (IOException iox) {
+                                }
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                mProgressListener.onStringResponse(throwable.getMessage());
+                            }
+                        }));
+    }
+
+    public void charge(@NonNull final String paymentToken) {
+        final Map<String, String> map = new HashMap<>();
+        System.out.println("yo: " + paymentToken);
+        map.put("amount", "123");
+        map.put("source", paymentToken);
+        mCompositeSubscription.add(
+                mStripeService.charge(map)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<ResponseBody>() {
+                            @Override
+                            public void call(ResponseBody response) {
+                                try {
+                                    String rawKey = response.string();
+                                    mProgressListener.onStringResponse(rawKey);
+                                } catch (IOException iox) {
+                                }
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                mProgressListener.onStringResponse(throwable.getMessage());
+                            }
+                        }));
     }
 
     @Override

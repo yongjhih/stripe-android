@@ -9,12 +9,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.stripe.android.CustomerSession;
+import com.stripe.android.PaymentCompletionProvider;
+import com.stripe.android.PaymentResultListener;
 import com.stripe.android.PaymentSession;
 import com.stripe.android.PaymentSessionConfig;
 import com.stripe.android.PaymentSessionData;
@@ -58,6 +61,7 @@ public class PaymentSessionActivity extends AppCompatActivity {
     private Button mSelectPaymentButton;
     private Button mSelectShippingButton;
     private PaymentSessionData mPaymentSessionData;
+    private Button mChargeButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +76,7 @@ public class PaymentSessionActivity extends AppCompatActivity {
         mErrorDialogHandler = new ErrorDialogHandler(getSupportFragmentManager());
         mResultTitleTextView = findViewById(R.id.tv_payment_session_data_title);
         mResultTextView = findViewById(R.id.tv_payment_session_data);
+        mChargeButton = findViewById(R.id.btn_charge);
         setupCustomerSession(); // CustomerSession only needs to be initialized once per app.
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -103,12 +108,21 @@ public class PaymentSessionActivity extends AppCompatActivity {
                 mPaymentSession.presentShippingFlow();
             }
         });
-
+        mChargeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPaymentSession.completePayment(new PaymentCompletionProvider() {
+                    @Override
+                    public void completePayment(@NonNull PaymentSessionData data, @NonNull PaymentResultListener listener) {
+                        Log.d("yo", data.getSelectedPaymentMethodId());
+                        exampleEphemeralKeyProvider.customerCharge(data, mCustomer);
+                    }
+                });
+            }
+        });
     }
 
-    private void setupCustomerSession() {
-        CustomerSession.initCustomerSession(
-                new ExampleEphemeralKeyProvider(
+    private ExampleEphemeralKeyProvider exampleEphemeralKeyProvider = new ExampleEphemeralKeyProvider(
                         new ExampleEphemeralKeyProvider.ProgressListener() {
                             @Override
                             public void onStringResponse(String string) {
@@ -116,7 +130,10 @@ public class PaymentSessionActivity extends AppCompatActivity {
                                     mErrorDialogHandler.showError(string);
                                 }
                             }
-                        }));
+                        });
+
+    private void setupCustomerSession() {
+        CustomerSession.initCustomerSession(exampleEphemeralKeyProvider);
         CustomerSession.getInstance().retrieveCurrentCustomer(
                 new CustomerSession.CustomerRetrievalListener() {
                     @Override

@@ -52,4 +52,12 @@
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         />
 
+    <Button
+        android:id="@+id/btn_charge"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/example_vertical_spacing"
+        android:text="Charge"
+        />
 </LinearLayout>

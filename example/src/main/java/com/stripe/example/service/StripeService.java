@@ -18,4 +18,11 @@ public interface StripeService {
     @POST("ephemeral_keys")
     Observable<ResponseBody> createEphemeralKey(@FieldMap Map<String, String> apiVersionMap);
 
+    @FormUrlEncoded
+    @POST("create_charge")
+    Observable<ResponseBody> charge(@FieldMap Map<String, String> charge);
+
+    @FormUrlEncoded
+    @POST("charge")
+    Observable<ResponseBody> customerCharge(@FieldMap Map<String, String> charge);
 }
