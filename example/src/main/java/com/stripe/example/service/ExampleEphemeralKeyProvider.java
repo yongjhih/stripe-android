@@ -42,6 +42,33 @@ public class ExampleEphemeralKeyProvider implements EphemeralKeyProvider {
         return mStripeService;
     }
 
+    public void customerSubscribe(@NonNull final PaymentSessionData data, @NonNull final Customer customer) {
+        final String paymentToken = data.getSelectedPaymentMethodId();
+        final Map<String, String> map = new HashMap<>();
+        System.out.println("yo: " + paymentToken);
+        map.put("customer_id", customer.getId());
+        //map.put("shipping", data.getShippingMethod().getIdentifier());
+        mCompositeSubscription.add(
+                mStripeService.customerSubscribe(map)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<ResponseBody>() {
+                            @Override
+                            public void call(ResponseBody response) {
+                                try {
+                                    String rawKey = response.string();
+                                    mProgressListener.onStringResponse(rawKey);
+                                } catch (IOException iox) {
+                                }
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                mProgressListener.onStringResponse(throwable.getMessage());
+                            }
+                        }));
+    }
+
     public void customerCharge(@NonNull final PaymentSessionData data, @NonNull final Customer customer) {
         final String paymentToken = data.getSelectedPaymentMethodId();
         final Map<String, String> map = new HashMap<>();

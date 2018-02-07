@@ -115,7 +115,7 @@ public class PaymentSessionActivity extends AppCompatActivity {
                     @Override
                     public void completePayment(@NonNull PaymentSessionData data, @NonNull PaymentResultListener listener) {
                         Log.d("yo", data.getSelectedPaymentMethodId());
-                        exampleEphemeralKeyProvider.customerCharge(data, mCustomer);
+                        exampleEphemeralKeyProvider.customerSubscribe(data, mCustomer);
                     }
                 });
             }

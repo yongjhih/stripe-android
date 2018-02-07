@@ -25,4 +25,8 @@ public interface StripeService {
     @FormUrlEncoded
     @POST("charge")
     Observable<ResponseBody> customerCharge(@FieldMap Map<String, String> charge);
+
+    @FormUrlEncoded
+    @POST("subscribe")
+    Observable<ResponseBody> customerSubscribe(@FieldMap Map<String, String> subscribe);
 }
